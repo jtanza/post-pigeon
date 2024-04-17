@@ -13,9 +13,9 @@ create table post_location (
   post_uuid integer not null,
   s3 text not null,
   url text not null,
-  foreign key(post_uuid) references post(uuid),
   created_at datetime,
   updated_at datetime,
-  deleted_at datetime
+  deleted_at datetime,
+  foreign key(post_uuid) references post(uuid)
 );
 

@@ -10,30 +10,16 @@
 
 <!-- navbar -->
 <nav class="navbar is-dark has-shadow" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a class="navbar-item" href="https://bulma.io">
-            Radicchio
-        </a>
-    </div>
-    <div class="navbar-menu">
-        <div class="navbar-start">
-            <a class="navbar-item" href="about">
-                About
-            </a>
-        </div>
-        <div class="navbar-end">
-            <div class="navbar-item">
-                <div class="buttons">
-                    <a class="button is-primary">
-                        <strong>Sign up</strong>
-                    </a>
-                    <a class="button is-light">
-                        Log in
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div class="navbar-brand">
+      <a class="navbar-item" href="https://bulma.io">
+          Post Pigeon
+      </a>
+  </div>
+  <div class="navbar-menu">
+      <div class="navbar-start">
+          <a class="navbar-item">About</a>
+      </div>
+  </div>
 </nav>
 
 <!-- form -->
@@ -42,7 +28,7 @@
         <div class="columns">
             <div class="column is-half is-offset-one-quarter">
                 <div class="field">
-                    <label class="label">Recipe Title</label>
+                    <label class="label">Post Title</label>
                     <div class="control">
                         <label>
                             <input name="title" class="input" type="text" placeholder="Text input">
@@ -50,168 +36,12 @@
                     </div>
                 </div>
 
+                <!-- Content -->
                 <div class="field">
-                    <label class="label">Description</label>
+                    <label class="label">Content</label>
                     <div class="control">
                         <label>
-                            <input name="description" class="input" type="text" placeholder="The cheesiest veganiest mac n' cheese">
-                        </label>
-                    </div>
-                </div>
-
-                <div class="field is-grouped is-grouped-multiline">
-                    <div class="field">
-                        <label class="label">Cook Time</label>
-                        <div class="control">
-                            <label>
-                                <input name="cooktime" class="input" type="email" placeholder="In minutes">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Total Time</label>
-                        <div class="control">
-                            <label>
-                                <input name="totaltime" class="input" type="email" placeholder="In minutes">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Difficulty</label>
-                        <div class="control">
-                            <div class="select">
-                                <label>
-                                    <select name="difficulty">
-                                        <option>easy</option>
-                                        <option>moderate</option>
-                                        <option>hard</option>
-                                        <option>professional</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Cuisine</label>
-                        <div class="control">
-                            <div class="select">
-                                <label>
-                                    <select name="cuisine">
-                                        <option>African</option>
-                                        <option>Italian</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Cuisine Style</label>
-                        <div class="control">
-                            <div class="select">
-                                <label>
-                                    <select name="cuisinestyle">
-                                        <option>Fast Food</option>
-                                        <option>Fusion</option>
-                                        <option>Vegan</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Serves</label>
-                        <div class="control">
-                            <div class="select">
-                                <label>
-                                    <select name="serves">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                        <option>6</option>
-                                        <option>7</option>
-                                        <option>9</option>
-                                        <option>10+</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Components -->
-                <div id="container">
-                    <div id="mainsection" class="box">
-                        <div  class="field is-grouped-multiline">
-                            <div class="field">
-                                <label class="label">Component Name</label>
-                                <div class="control">
-                                    <label>
-                                        <input name="componentname" class="input" type="text" placeholder="Text input">
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <label class="label">Ingredients</label>
-                                <div class="control">
-                                    <label>
-                                        <textarea name="ingredients" class="textarea" placeholder="3 cups of rice&#10;A pinch of salt"></textarea>
-                                    </label>
-                                </div>
-                                <p class="help">A newline separated list of ingredients for this component</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ingredient list -->
-                <!--                <div class="field">-->
-                <!--                    <label class="label">Ingredients</label>-->
-                <!--                    <div class="control">-->
-                <!--                        <input class="input" type="text" placeholder="3 cups of rice">-->
-                <!--                    </div>-->
-                <!--                    <br>-->
-                <!--                    <div class="control">-->
-                <!--                        <input class="input" type="text" placeholder="A pinch of salt">-->
-                <!--                    </div>-->
-                <!--                </div>-->
-                <!--                <div class="field is-grouped is-grouped-right">-->
-                <!--                    <p class="control">-->
-                <!--                        <button class="button is-primary">-->
-                <!--                            Add Ingredient-->
-                <!--                        </button>-->
-                <!--                    </p>-->
-                <!--                </div>-->
-
-                <!--                <div class="field">-->
-                <!--                    <label class="label">Directions</label>-->
-                <!--                    <div class="control">-->
-                <!--                        <textarea class="textarea" placeholder="Cook the rice at..."></textarea>-->
-                <!--                    </div>-->
-                <!--                </div>-->
-                <!--            </div>-->
-
-                <br>
-                <div class="field is-grouped is-grouped-right">
-                    <p class="control">
-                        <button type="button" id="newsectionbtn" class="button is-primary">
-                            Add Component
-                        </button>
-                    </p>
-                </div>
-
-                <!-- Assembly -->
-                <div class="field">
-                    <label class="label">Assembly</label>
-                    <div class="control">
-                        <label>
-                            <textarea name="assembly_instructions" class="textarea" placeholder="Assemble the ..."></textarea>
+                            <textarea name="body" class="textarea" placeholder="Assemble the ..." rows="17"></textarea>
                         </label>
                     </div>
                 </div>
@@ -228,7 +58,5 @@
         </div>
     </section>
 </form>
-
-<script src="./public/script.js" type="text/javascript"></script>
 </body>
 </html>
