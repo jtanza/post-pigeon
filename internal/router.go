@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -49,16 +48,11 @@ func (r Router) Engine() *echo.Echo {
 }
 
 func (r Router) createPost(c echo.Context) error {
-	j := make(map[string]interface{})
-	if err := json.NewDecoder(c.Request().Body).Decode(&j); err != nil {
-		return err
-	}
-	log.Printf("Json Request: %+v", j)
-
 	var request model.PostRequest
 	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+	log.Println("here " + request.Body)
 
 	if err := c.Validate(request); err != nil {
 		return err

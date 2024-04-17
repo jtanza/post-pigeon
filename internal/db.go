@@ -3,7 +3,6 @@ package internal
 import (
 	"log"
 
-	"github.com/google/uuid"
 	"github.com/jtanza/post-pigeon/internal/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -25,10 +24,8 @@ func OpenDB() *gorm.DB {
 	return db
 }
 
-func StorePost(db *gorm.DB, request model.PostRequest, s3Location string) (string, error) {
-	postUUID := uuid.New().String()
-
-	return postUUID, db.Transaction(func(tx *gorm.DB) error {
+func StorePost(db *gorm.DB, postUUID string, request model.PostRequest, s3Location string) error {
+	return db.Transaction(func(tx *gorm.DB) error {
 		post := model.Post{
 			UUID:  postUUID,
 			Title: request.Title,

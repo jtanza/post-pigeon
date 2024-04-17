@@ -5,6 +5,7 @@ import (
 	"html/template"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/google/uuid"
 	"github.com/jtanza/post-pigeon/internal/model"
 	"gorm.io/gorm"
 )
@@ -24,17 +25,17 @@ func (r PostCreator) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	s3Url, err := UploadPost(r.S3Client, html)
+	postUUID := uuid.New().String()
+	s3Url, err := UploadPost(r.S3Client, postUUID, html)
 	if err != nil {
 		return "", err
 	}
 
-	id, err := StorePost(r.DB, request, s3Url)
-	if err != nil {
+	if err = StorePost(r.DB, postUUID, request, s3Url); err != nil {
 		return "", err
 	}
 
-	return id, err
+	return postUUID, err
 }
 
 func (r PostCreator) toHTML(request model.PostRequest) (string, error) {

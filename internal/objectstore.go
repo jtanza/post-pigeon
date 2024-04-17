@@ -25,8 +25,8 @@ func CreateS3Client() *s3.Client {
 	return s3.NewFromConfig(cfg)
 }
 
-func UploadPost(client *s3.Client, html string) (string, error) {
-	key := genKey()
+func UploadPost(client *s3.Client, postUUID string, html string) (string, error) {
+	key := genKey(postUUID)
 	_, err := client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(PostBucket),
 		Key:    aws.String(key),
@@ -42,16 +42,15 @@ func toS3Url(bucket, key string) string {
 	return fmt.Sprintf("s3://%s/%s", bucket, key)
 }
 
-func genKey() string {
+func genKey(postUUID string) string {
 	// title := strings.ToLower(strings.ReplaceAll(request.Title, " ", "-"))
 	// if len(title) > maxTitle {
 	// 	title = title[:maxTitle]
 	// }
 
 	return fmt.Sprintf(
-		"%s-%s-%d",
-		"request.Author",
-		"title",
+		"%s-%d",
+		postUUID,
 		time.Now().Unix(),
 	)
 }
