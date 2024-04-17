@@ -24,10 +24,10 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 
 type Router struct {
 	db          *gorm.DB
-	postCreator PostCreator
+	postCreator PostManager
 }
 
-func NewRouter(db *gorm.DB, postCreator PostCreator) Router {
+func NewRouter(db *gorm.DB, postCreator PostManager) Router {
 	return Router{db, postCreator}
 }
 

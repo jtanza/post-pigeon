@@ -10,22 +10,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type PostCreator struct {
+const namespace = "post-pigeon-namespace"
+
+type PostManager struct {
 	DB       *gorm.DB
 	S3Client *s3.Client
 }
 
-func NewPostCreator(db *gorm.DB, s3Client *s3.Client) PostCreator {
-	return PostCreator{db, s3Client}
+func NewPostManager(db *gorm.DB, s3Client *s3.Client) PostManager {
+	return PostManager{db, s3Client}
 }
 
-func (r PostCreator) CreatePost(request model.PostRequest) (string, error) {
+func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 	html, err := r.toHTML(request)
 	if err != nil {
 		return "", err
 	}
 
-	postUUID := uuid.New().String()
+	postUUID, err := generatePostUUID(request)
+	if err != nil {
+		return "", err
+	}
+
 	s3Url, err := UploadPost(r.S3Client, postUUID, html)
 	if err != nil {
 		return "", err
@@ -38,7 +44,7 @@ func (r PostCreator) CreatePost(request model.PostRequest) (string, error) {
 	return postUUID, err
 }
 
-func (r PostCreator) toHTML(request model.PostRequest) (string, error) {
+func (r PostManager) toHTML(request model.PostRequest) (string, error) {
 	t, err := template.New("post").ParseFiles("templates/post")
 	if err != nil {
 		return "", err
@@ -64,4 +70,13 @@ func parseRequest(request model.PostRequest) (map[string]any, error) {
 	}
 
 	return m, nil
+}
+
+func generatePostUUID(request model.PostRequest) (string, error) {
+	id, err := uuid.FromBytes([]byte(namespace)[:16])
+	if err != nil {
+		return "", err
+	}
+
+	return uuid.NewSHA1(id, []byte(request.Body)).String(), nil
 }
