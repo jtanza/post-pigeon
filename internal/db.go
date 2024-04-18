@@ -52,12 +52,15 @@ func (d DB) PersistPost(postUUID string, request model.PostRequest, s3Location s
 
 func (d DB) DeletePost(postUUID string) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		post := model.Post{UUID: postUUID}
-		if queryResult := d.db.First(&post); queryResult.Error != nil {
-			return queryResult.Error
+		if postDelete := d.db.Where("uuid = ?", postUUID).Delete(&model.Post{}); postDelete.Error != nil {
+			return postDelete.Error
 		}
 
-		return d.db.Delete(&model.Post{}, post.ID).Error
+		if postLocationDelete := d.db.Where("post_uuid = ?", postUUID).Delete(&model.PostLocation{}); postLocationDelete.Error != nil {
+			return postLocationDelete.Error
+		}
+
+		return nil
 	})
 }
 
