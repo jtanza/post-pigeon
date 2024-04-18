@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -52,7 +51,6 @@ func (r Router) createPost(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	log.Println("here " + request.Body)
 
 	if err := c.Validate(request); err != nil {
 		return err
@@ -63,6 +61,6 @@ func (r Router) createPost(c echo.Context) error {
 		return err
 	}
 
-	//return c.Redirect(http.StatusPermanentRedirect, resp)
-	return c.String(http.StatusOK, uuid)
+	return c.Redirect(http.StatusPermanentRedirect, uuid)
+	//return c.String(http.StatusOK, uuid)
 }

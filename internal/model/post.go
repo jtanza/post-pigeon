@@ -5,8 +5,8 @@ import (
 )
 
 type PostRequest struct {
-	Title string `json:"title" validate:"required"`
-	Body  string `json:"body" validate:"required"`
+	Title string `form:"title" validate:"required"`
+	Body  string `form:"body" validate:"required"`
 }
 
 type Post struct {
