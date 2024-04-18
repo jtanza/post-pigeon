@@ -1,13 +1,14 @@
 package internal
 
 import (
+	"bytes"
+	"html/template"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/jtanza/post-pigeon/internal/model"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gorm.io/gorm"
 )
 
 type CustomValidator struct {
@@ -22,11 +23,11 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 }
 
 type Router struct {
-	db          *gorm.DB
+	db          DB
 	postCreator PostManager
 }
 
-func NewRouter(db *gorm.DB, postCreator PostManager) Router {
+func NewRouter(db DB, postCreator PostManager) Router {
 	return Router{db, postCreator}
 }
 
@@ -36,12 +37,12 @@ func (r Router) Engine() *echo.Echo {
 	e.Use(middleware.Logger())
 	e.Validator = &CustomValidator{validator: validator.New()}
 
-	e.Static("public", "./public")
+	e.HTTPErrorHandler = customHTTPErrorHandler
 
-	e.File("/about", "public/about.html")
 	e.File("/new", "public/new.html")
 
 	e.POST("/posts", r.createPost)
+	e.DELETE("/posts/:uuid", r.deletePost)
 
 	return e
 }
@@ -61,6 +62,50 @@ func (r Router) createPost(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusPermanentRedirect, uuid)
+	return c.Redirect(http.StatusPermanentRedirect, FormatKeyPath(uuid))
 	//return c.String(http.StatusOK, uuid)
+}
+
+func (r Router) deletePost(c echo.Context) error {
+	id := c.Param("uuid")
+	if err := r.postCreator.RemovePost(id); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusAccepted, id)
+}
+
+func customHTTPErrorHandler(err error, c echo.Context) {
+	code := http.StatusInternalServerError
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+	}
+
+	c.Logger().Error(err)
+
+	h, err := errorHTML(err, code)
+	if err != nil {
+		c.Logger().Error(err)
+	}
+
+	c.HTML(code, h)
+}
+
+func errorHTML(e error, code int) (string, error) {
+	t, err := template.New("error").ParseFiles("templates/error")
+	if err != nil {
+		return "", err
+	}
+
+	m := map[string]interface{}{
+		"Error":  e.Error(),
+		"Status": code,
+	}
+
+	var buf bytes.Buffer
+	if err = t.Execute(&buf, m); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PostPigeon - {{ .Title }} </title>
+    <title>PostPigeon</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
 <nav class="navbar is-dark has-shadow" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item" href="https://bulma.io">
-            Radicchio
+            PostPigeon
             <!--<img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">-->
         </a>
     </div>
@@ -27,11 +27,9 @@
 <div class="columns is-mobile">
   <div class="column is-8 is-offset-2">
     <section class="section">
-      <h1 class="title">{{ .Title}}</h1>
-      <div class="content">
-        <p>{{ .Body }}</p>
-      </div>
+      <h1 class="title">{{ .Status}}</h1>
     </section>
+    <p>{{ .Error }}</p>
   </div>
 </div>
 </body>

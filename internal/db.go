@@ -10,7 +10,11 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-func OpenDB() *gorm.DB {
+type DB struct {
+	db *gorm.DB
+}
+
+func NewDB() DB {
 	db, err := gorm.Open(sqlite.Open(createDSN()), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 		NamingStrategy: schema.NamingStrategy{
@@ -20,12 +24,11 @@ func OpenDB() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return db
+	return DB{db}
 }
 
-func StorePost(db *gorm.DB, postUUID string, request model.PostRequest, s3Location string) error {
-	return db.Transaction(func(tx *gorm.DB) error {
+func (d DB) PersistPost(postUUID string, request model.PostRequest, s3Location string) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
 		post := model.Post{
 			UUID:  postUUID,
 			Title: request.Title,
@@ -44,6 +47,17 @@ func StorePost(db *gorm.DB, postUUID string, request model.PostRequest, s3Locati
 		}
 
 		return nil
+	})
+}
+
+func (d DB) DeletePost(postUUID string) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		post := model.Post{UUID: postUUID}
+		if queryResult := d.db.First(&post); queryResult.Error != nil {
+			return queryResult.Error
+		}
+
+		return d.db.Delete(&model.Post{}, post.ID).Error
 	})
 }
 

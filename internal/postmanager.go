@@ -4,20 +4,18 @@ import (
 	"bytes"
 	"html/template"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
 	"github.com/jtanza/post-pigeon/internal/model"
-	"gorm.io/gorm"
 )
 
 const namespace = "post-pigeon-namespace"
 
 type PostManager struct {
-	DB       *gorm.DB
-	S3Client *s3.Client
+	db       DB
+	s3Client S3Client
 }
 
-func NewPostManager(db *gorm.DB, s3Client *s3.Client) PostManager {
+func NewPostManager(db DB, s3Client S3Client) PostManager {
 	return PostManager{db, s3Client}
 }
 
@@ -27,21 +25,29 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	postUUID, err := generatePostUUID(request)
+	postUUID, err := generateDeterministicUUID(request)
 	if err != nil {
 		return "", err
 	}
 
-	s3Url, err := UploadPost(r.S3Client, postUUID, html)
+	s3Url, err := r.s3Client.UploadPostObject(postUUID, html)
 	if err != nil {
 		return "", err
 	}
 
-	if err = StorePost(r.DB, postUUID, request, s3Url); err != nil {
+	if err = r.db.PersistPost(postUUID, request, s3Url); err != nil {
 		return "", err
 	}
 
 	return postUUID, err
+}
+
+func (r PostManager) RemovePost(postUUID string) error {
+	if err := r.s3Client.DeletePostObject(postUUID); err != nil {
+		return err
+	}
+
+	return r.db.DeletePost(postUUID)
 }
 
 func (r PostManager) toHTML(request model.PostRequest) (string, error) {
@@ -72,7 +78,7 @@ func parseRequest(request model.PostRequest) (map[string]any, error) {
 	return m, nil
 }
 
-func generatePostUUID(request model.PostRequest) (string, error) {
+func generateDeterministicUUID(request model.PostRequest) (string, error) {
 	id, err := uuid.FromBytes([]byte(namespace)[:16])
 	if err != nil {
 		return "", err
