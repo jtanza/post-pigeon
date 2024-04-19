@@ -23,35 +23,16 @@
 </nav>
 
 <!-- form -->
-<form id="foo" action="/posts" method="POST">
+<!-- DELETE doesnt work for forms. Need to send JSON request -->
+<form id="foo" action="/posts" method="DELETE">
     <section class="section">
         <div class="columns">
             <div class="column is-half is-offset-one-quarter">
                 <div class="field">
-                    <label class="label">Title</label>
+                    <label class="label">UUID</label>
                     <div class="control">
                         <label>
-                            <input name="title" class="input" type="text" placeholder="Text input">
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Content -->
-                <div class="field">
-                    <label class="label">Content</label>
-                    <div class="control">
-                        <label>
-                            <textarea name="body" class="textarea" placeholder="Assemble the ..." rows="15"></textarea>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Public Key -->
-                <div class="field">
-                    <label class="label">Public Key</label>
-                    <div class="control">
-                        <label>
-                            <textarea name="publickey" class="textarea" placeholder="-----BEGIN PUBLIC KEY-----MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAdI8T8Vfccs6rWACR3b5o3MuVkYjfgN2nnYAXYNC4fIVWgyfEeTYIGIjLxEB9BLquMld4Je+1vITaNQWfuRTD2HcBax6NRwxwcNGqwoJNWpCry9AXxRiDACkks9I2f08BIIHlOCLnPUfIWrASmuNGhyWtSUtAJrEKBzI+y/fyWp7z09U=-----END PUBLIC KEY-----" rows="6"></textarea>
+                            <input name="uuid" class="input" type="text" placeholder="1b2b62db-5ea4-512d-a1a3-ff3e620a2f46">
                         </label>
                     </div>
                 </div>

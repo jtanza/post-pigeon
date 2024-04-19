@@ -28,19 +28,18 @@ func NewDB() DB {
 	return DB{db}
 }
 
-func (d DB) PersistPost(postUUID string, request model.PostRequest, html string) error {
+func (d DB) PersistPost(postUUID string, request model.PostRequest, html string, signature string) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		post := model.Post{
-			UUID:  postUUID,
-			Title: request.Title,
-		}
+		post := model.Post{UUID: postUUID}
 		if postResult := tx.Create(&post); postResult.Error != nil {
 			return postResult.Error
 		}
 
 		postLocation := model.PostContent{
-			PostUUID: postUUID,
-			HTML:     html,
+			PostUUID:  postUUID,
+			HTML:      html,
+			Signature: signature,
+			Title:     request.Title,
 		}
 		if postLocationResult := tx.Create(&postLocation); postLocationResult.Error != nil {
 			return postLocationResult.Error
@@ -50,13 +49,13 @@ func (d DB) PersistPost(postUUID string, request model.PostRequest, html string)
 	})
 }
 
-func (d DB) DeletePost(postUUID string) error {
+func (d DB) DeletePost(postDeleteRequest model.PostDeleteRequest) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		if postDelete := d.db.Where("uuid = ?", postUUID).Delete(&model.Post{}); postDelete.Error != nil {
+		if postDelete := d.db.Where("uuid = ?", postDeleteRequest.UUID).Delete(&model.Post{}); postDelete.Error != nil {
 			return postDelete.Error
 		}
 
-		if postContentDelete := d.db.Where("post_uuid = ?", postUUID).Delete(&model.PostContent{}); postContentDelete.Error != nil {
+		if postContentDelete := d.db.Where("post_uuid = ?", postDeleteRequest.UUID).Delete(&model.PostContent{}); postContentDelete.Error != nil {
 			return postContentDelete.Error
 		}
 

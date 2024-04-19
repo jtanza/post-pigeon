@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bytes"
+	"errors"
 	"html/template"
 
 	"github.com/google/uuid"
@@ -19,25 +20,36 @@ func NewPostManager(db DB) PostManager {
 }
 
 func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
+	if err := ValidateSignature(request.PublicKey, request.Signature, request.Body); err != nil {
+		return "", errors.New("could not validate signature")
+	}
+
 	html, err := r.toHTML(request)
 	if err != nil {
 		return "", err
 	}
 
-	postUUID, err := generateDeterministicUUID(request)
+	postUUID, err := generateDeterministicUUID(request.Signature)
 	if err != nil {
 		return "", err
 	}
 
-	if err = r.db.PersistPost(postUUID, request, html); err != nil {
+	if err = r.db.PersistPost(postUUID, request, html, request.Signature); err != nil {
 		return "", err
 	}
 
 	return postUUID, err
 }
 
-func (r PostManager) RemovePost(postUUID string) error {
-	return r.db.DeletePost(postUUID)
+func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
+	content, err := r.db.GetPostContent(request.UUID)
+	if err != nil {
+		return err
+	}
+	if content.Signature != request.Signature {
+		return errors.New("could not verify signature")
+	}
+	return r.db.DeletePost(request)
 }
 
 func (r PostManager) FetchPostContent(postUUID string) (model.PostContent, error) {
@@ -72,11 +84,12 @@ func parseRequest(request model.PostRequest) (map[string]any, error) {
 	return m, nil
 }
 
-func generateDeterministicUUID(request model.PostRequest) (string, error) {
+// we use the base64 encoded signature to produce the deterministic (version 5) uuid
+func generateDeterministicUUID(signature string) (string, error) {
 	id, err := uuid.FromBytes([]byte(namespace)[:16])
 	if err != nil {
 		return "", err
 	}
 
-	return uuid.NewSHA1(id, []byte(request.Body)).String(), nil
+	return uuid.NewSHA1(id, []byte(signature)).String(), nil
 }

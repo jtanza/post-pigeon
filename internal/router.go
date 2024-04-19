@@ -41,10 +41,11 @@ func (r Router) Engine() *echo.Echo {
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	e.File("/new", "public/new.html")
+	e.File("/delete", "public/delete.html")
 
 	e.GET("/posts/:uuid", r.getPost)
 	e.POST("/posts", r.createPost)
-	e.DELETE("/posts/:uuid", r.deletePost)
+	e.DELETE("/posts", r.deletePost)
 
 	return e
 }
@@ -78,12 +79,20 @@ func (r Router) createPost(c echo.Context) error {
 }
 
 func (r Router) deletePost(c echo.Context) error {
-	id := c.Param("uuid")
-	if err := r.postManager.RemovePost(id); err != nil {
+	var request model.PostDeleteRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := c.Validate(request); err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusAccepted, id)
+	if err := r.postManager.RemovePost(request); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusAccepted, request.UUID)
 }
 
 func customHTTPErrorHandler(e error, c echo.Context) {
