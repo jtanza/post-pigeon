@@ -11,12 +11,11 @@ import (
 const namespace = "post-pigeon-namespace"
 
 type PostManager struct {
-	db       DB
-	s3Client S3Client
+	db DB
 }
 
-func NewPostManager(db DB, s3Client S3Client) PostManager {
-	return PostManager{db, s3Client}
+func NewPostManager(db DB) PostManager {
+	return PostManager{db}
 }
 
 func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
@@ -30,12 +29,7 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	s3Url, err := r.s3Client.UploadPostObject(postUUID, html)
-	if err != nil {
-		return "", err
-	}
-
-	if err = r.db.PersistPost(postUUID, request, s3Url); err != nil {
+	if err = r.db.PersistPost(postUUID, request, html); err != nil {
 		return "", err
 	}
 
@@ -43,11 +37,11 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 }
 
 func (r PostManager) RemovePost(postUUID string) error {
-	if err := r.s3Client.DeletePostObject(postUUID); err != nil {
-		return err
-	}
-
 	return r.db.DeletePost(postUUID)
+}
+
+func (r PostManager) FetchPostContent(postUUID string) (model.PostContent, error) {
+	return r.db.GetPostContent(postUUID)
 }
 
 func (r PostManager) toHTML(request model.PostRequest) (string, error) {

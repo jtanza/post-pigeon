@@ -8,11 +8,10 @@ create table post (
 );
 create index post_uuid_idx on post(uuid);
 
-create table post_location (
+create table post_content (
   id    integer primary key asc,
   post_uuid integer not null,
-  s3 text not null,
-  url text not null,
+  html text not null,
   created_at datetime,
   updated_at datetime,
   deleted_at datetime,

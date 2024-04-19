@@ -16,10 +16,9 @@ type Post struct {
 	Title string
 }
 
-type PostLocation struct {
+type PostContent struct {
 	gorm.Model
 	ID       int
 	PostUUID string
-	S3       string
-	URL      string
+	HTML     string
 }

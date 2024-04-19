@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -24,7 +25,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 
 type Router struct {
 	db          DB
-	postCreator PostManager
+	postManager PostManager
 }
 
 func NewRouter(db DB, postCreator PostManager) Router {
@@ -41,10 +42,21 @@ func (r Router) Engine() *echo.Echo {
 
 	e.File("/new", "public/new.html")
 
+	e.GET("/posts/:uuid", r.getPost)
 	e.POST("/posts", r.createPost)
 	e.DELETE("/posts/:uuid", r.deletePost)
 
 	return e
+}
+
+func (r Router) getPost(c echo.Context) error {
+	id := c.Param("uuid")
+	postContent, err := r.postManager.FetchPostContent(id)
+	if err != nil {
+		return err
+	}
+
+	return c.HTML(http.StatusOK, postContent.HTML)
 }
 
 func (r Router) createPost(c echo.Context) error {
@@ -57,38 +69,38 @@ func (r Router) createPost(c echo.Context) error {
 		return err
 	}
 
-	uuid, err := r.postCreator.CreatePost(request)
+	uuid, err := r.postManager.CreatePost(request)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusPermanentRedirect, FormatKeyPath(uuid))
-	//return c.String(http.StatusOK, uuid)
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("posts/%s", uuid))
 }
 
 func (r Router) deletePost(c echo.Context) error {
 	id := c.Param("uuid")
-	if err := r.postCreator.RemovePost(id); err != nil {
+	if err := r.postManager.RemovePost(id); err != nil {
 		return err
 	}
 
 	return c.JSON(http.StatusAccepted, id)
 }
 
-func customHTTPErrorHandler(err error, c echo.Context) {
+func customHTTPErrorHandler(e error, c echo.Context) {
 	code := http.StatusInternalServerError
-	if he, ok := err.(*echo.HTTPError); ok {
+	if he, ok := e.(*echo.HTTPError); ok {
 		code = he.Code
 	}
+	c.Logger().Error(e)
 
-	c.Logger().Error(err)
-
-	h, err := errorHTML(err, code)
+	h, err := errorHTML(e, code)
 	if err != nil {
 		c.Logger().Error(err)
 	}
 
-	c.HTML(code, h)
+	if err = c.HTML(code, h); err != nil {
+		c.Logger().Error(err)
+	}
 }
 
 func errorHTML(e error, code int) (string, error) {

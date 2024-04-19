@@ -28,7 +28,7 @@ func NewDB() DB {
 	return DB{db}
 }
 
-func (d DB) PersistPost(postUUID string, request model.PostRequest, s3Location string) error {
+func (d DB) PersistPost(postUUID string, request model.PostRequest, html string) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		post := model.Post{
 			UUID:  postUUID,
@@ -38,10 +38,9 @@ func (d DB) PersistPost(postUUID string, request model.PostRequest, s3Location s
 			return postResult.Error
 		}
 
-		postLocation := model.PostLocation{
+		postLocation := model.PostContent{
 			PostUUID: postUUID,
-			S3:       s3Location,
-			URL:      s3Location,
+			HTML:     html,
 		}
 		if postLocationResult := tx.Create(&postLocation); postLocationResult.Error != nil {
 			return postLocationResult.Error
@@ -57,12 +56,20 @@ func (d DB) DeletePost(postUUID string) error {
 			return postDelete.Error
 		}
 
-		if postLocationDelete := d.db.Where("post_uuid = ?", postUUID).Delete(&model.PostLocation{}); postLocationDelete.Error != nil {
-			return postLocationDelete.Error
+		if postContentDelete := d.db.Where("post_uuid = ?", postUUID).Delete(&model.PostContent{}); postContentDelete.Error != nil {
+			return postContentDelete.Error
 		}
 
 		return nil
 	})
+}
+
+func (d DB) GetPostContent(postUUID string) (model.PostContent, error) {
+	postContent := model.PostContent{}
+	if postQuery := d.db.Where("post_uuid = ?", postUUID).First(&postContent); postQuery.Error != nil {
+		return model.PostContent{}, postQuery.Error
+	}
+	return postContent, nil
 }
 
 func createDSN() string {
