@@ -24,6 +24,7 @@ func NewDB() DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return DB{db}
 }
 
