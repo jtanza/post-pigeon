@@ -71,6 +71,14 @@ func (d DB) GetPostContent(postUUID string) (model.PostContent, error) {
 	return postContent, nil
 }
 
+func (d DB) GetPostFromSignature(signature string) (model.PostContent, error) {
+	postContent := model.PostContent{}
+	if postQuery := d.db.Where("signature = ?", signature).First(&postContent); postQuery.Error != nil {
+		return model.PostContent{}, postQuery.Error
+	}
+	return postContent, nil
+}
+
 func createDSN() string {
 	// https://github.com/mattn/go-sqlite3?tab=readme-ov-file#dsn-examples
 	// file:test.db?cache=shared&mode=memory

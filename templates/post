@@ -7,32 +7,22 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-
-<!-- navbar -->
-<nav class="navbar is-dark has-shadow" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a class="navbar-item" href="https://bulma.io">
-            Radicchio
-            <!--<img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">-->
-        </a>
-    </div>
-    <div class="navbar-menu">
-        <div class="navbar-start">
-            <a class="navbar-item">About</a>
-        </div>
-    </div>
-</nav>
-
-<!-- Content -->
 <div class="columns is-mobile">
   <div class="column is-8 is-offset-2">
     <section class="section">
-      <h1 class="title">{{ .Title}}</h1>
-      <div class="content">
+        <div class="mb-6">
+            <p style="display:inline" class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</p>
+            <a class="mr-3">Home</a>
+            <a class="mr-3">Documentation</a>
+        </div>
+      <h1 class="title is-2 is-spaced has-text-weight-bold">{{ .Title}}</h1>
+        <h4 class="subtitle is-6">{{ .CreationDate }}</h4>
+      <div class="content is-size-5 is-family-secondary">
         <p>{{ .Body }}</p>
       </div>
     </section>
   </div>
 </div>
+
 </body>
 </html>

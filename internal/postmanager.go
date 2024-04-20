@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"html/template"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jtanza/post-pigeon/internal/model"
@@ -42,10 +43,16 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 }
 
 func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
-	content, err := r.db.GetPostContent(request.UUID)
+	content, err := r.db.GetPostFromSignature(request.Signature)
 	if err != nil {
 		return err
 	}
+
+	if len(content.Signature) == 0 {
+		// dont leak proof of a non-existent post
+		return errors.New("could not verify signature")
+	}
+
 	if content.Signature != request.Signature {
 		return errors.New("could not verify signature")
 	}
@@ -77,8 +84,9 @@ func (r PostManager) toHTML(request model.PostRequest) (string, error) {
 
 func parseRequest(request model.PostRequest) (map[string]any, error) {
 	m := map[string]interface{}{
-		"Title": request.Title,
-		"Body":  request.Body,
+		"Title":        request.Title,
+		"Body":         request.Body,
+		"CreationDate": time.Now().Format(time.DateOnly),
 	}
 
 	return m, nil
