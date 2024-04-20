@@ -8,26 +8,18 @@
 </head>
 <body>
 
-<!-- navbar -->
-<nav class="navbar is-dark has-shadow" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-      <a class="navbar-item" href="https://bulma.io">
-          Post Pigeon
-      </a>
-  </div>
-  <div class="navbar-menu">
-      <div class="navbar-start">
-          <a class="navbar-item">About</a>
-      </div>
-  </div>
-</nav>
-
 <!-- form -->
-<!-- DELETE doesnt work for forms. Need to send JSON request -->
+<!-- TODO DELETE doesnt work for forms. Need to send JSON request -->
+<!-- https://softwareengineering.stackexchange.com/questions/114156/why-are-there-no-put-and-delete-methods-on-html-forms -->
 <form id="foo" action="/posts" method="DELETE">
     <section class="section">
         <div class="columns">
             <div class="column is-half is-offset-one-quarter">
+                <div class="mb-6">
+                    <a class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</a>
+                    <a class="mr-3">About</a>
+                    <a class="mr-3">Documentation</a>
+                </div>
                 <div class="field">
                     <label class="label">UUID</label>
                     <div class="control">
