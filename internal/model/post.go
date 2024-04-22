@@ -6,7 +6,7 @@ import (
 
 type PostRequest struct {
 	Title     string `form:"title" validate:"required"`
-	Body      string `form:"body" validate:"required"`
+	Body      string
 	PublicKey string `form:"publickey" validate:"required"`
 	Signature string `form:"signature" validate:"required"`
 }

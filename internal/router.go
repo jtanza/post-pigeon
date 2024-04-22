@@ -3,13 +3,13 @@ package internal
 import (
 	"bytes"
 	"fmt"
-	"html/template"
-	"net/http"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/jtanza/post-pigeon/internal/model"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"html/template"
+	"io"
+	"net/http"
 )
 
 type CustomValidator struct {
@@ -70,6 +70,12 @@ func (r Router) createPost(c echo.Context) error {
 		return err
 	}
 
+	body, err := readFile(c)
+	if err != nil {
+		return err
+	}
+	request.Body = body
+
 	uuid, err := r.postManager.CreatePost(request)
 	if err != nil {
 		return err
@@ -129,4 +135,23 @@ func errorHTML(e error, code int) (string, error) {
 	}
 
 	return buf.String(), nil
+}
+
+func readFile(c echo.Context) (string, error) {
+	file, err := c.FormFile("body")
+	if err != nil {
+		return "", err
+	}
+	src, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
+
+	b, err := io.ReadAll(src)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
 }
