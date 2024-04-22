@@ -49,5 +49,10 @@ func TestValidateSignatureVerifiesValidMessageNewline(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+}
 
+func TestFingerprint(t *testing.T) {
+	if id, err := internal.Fingerprint(pubKey); id != "FInWS6T+2/tTfzCteUyK0rQJelfKw7b9vhD6QlFiaoM" {
+		t.Error(err)
+	}
 }

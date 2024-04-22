@@ -25,25 +25,12 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", errors.New("could not validate signature")
 	}
 
-	//b := "hello world\nhow are you"
-	//if b != request.Body {
-	//	log.Info(request.Body)
-	//	return "", errors.New(diff.Diff(request.Body, b))
-	//}
-	//
-	//if err := ValidateSignature(
-	//	request.PublicKey,
-	//	request.Signature,
-	//	b,
-	//); err != nil {
-	//	return "", err
-	//}
-
 	html, err := r.toHTML(request)
 	if err != nil {
 		return "", err
 	}
 
+	// TODO fixme signatures arent deterministic. use hash(key, message)
 	postUUID, err := generateDeterministicUUID(request.Signature)
 	if err != nil {
 		return "", err
@@ -57,18 +44,23 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 }
 
 func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
+	post, err := r.db.GetPost(request.UUID)
+	if err != nil {
+		return err
+	}
+
+	if len(post.Key) == 0 {
+		// dont leak proof of a non-existent post
+		return errors.New("could not verify signature")
+	}
+
 	content, err := r.db.GetPostContent(request.UUID)
 	if err != nil {
 		return err
 	}
 
-	if len(content.Key) == 0 {
-		// dont leak proof of a non-existent post
-		return errors.New("could not verify signature")
-	}
-
 	// https://crypto.stackexchange.com/q/111536/116199
-	if err = ValidateSignature(content.Key, request.Signature, content.Message); err != nil {
+	if err = ValidateSignature(post.Key, request.Signature, content.Message); err != nil {
 		return errors.New("could not validate signature")
 	}
 

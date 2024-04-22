@@ -3,10 +3,13 @@ package internal
 import (
 	"crypto/ecdsa"
 	"crypto/sha1"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
+	"fmt"
+	"strings"
 )
 
 func ValidateSignature(rawPubKey string, base64EncodedSignature string, message string) error {
@@ -32,4 +35,19 @@ func ValidateSignature(rawPubKey string, base64EncodedSignature string, message 
 	}
 
 	return nil
+}
+
+// TODO
+func Fingerprint(pubKey string) (string, error) {
+	parts := strings.Split(pubKey, "\n")
+	base64Parts := parts[1 : len(parts)-1]
+
+	key, err := base64.StdEncoding.DecodeString(strings.Join(base64Parts, ""))
+	if err != nil {
+		return "", fmt.Errorf("can not parse key %s", err)
+	}
+
+	s := sha256.New()
+	s.Write(key)
+	return base64.RawStdEncoding.EncodeToString(s.Sum(nil)), nil
 }

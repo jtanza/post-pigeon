@@ -18,8 +18,10 @@ type PostDeleteRequest struct {
 
 type Post struct {
 	gorm.Model
-	ID   int
-	UUID string
+	ID          int
+	UUID        string
+	Key         string
+	Fingerprint string
 }
 
 type PostContent struct {
@@ -29,5 +31,4 @@ type PostContent struct {
 	Title    string
 	HTML     string
 	Message  string
-	Key      string
 }

@@ -30,7 +30,12 @@ func NewDB() DB {
 
 func (d DB) PersistPost(postUUID string, request model.PostRequest, html string) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		post := model.Post{UUID: postUUID}
+		fingerprint, err := Fingerprint(request.PublicKey)
+		if err != nil {
+			return err
+		}
+
+		post := model.Post{UUID: postUUID, Key: request.PublicKey, Fingerprint: fingerprint}
 		if postResult := tx.Create(&post); postResult.Error != nil {
 			return postResult.Error
 		}
@@ -38,7 +43,6 @@ func (d DB) PersistPost(postUUID string, request model.PostRequest, html string)
 		postLocation := model.PostContent{
 			PostUUID: postUUID,
 			HTML:     html,
-			Key:      request.PublicKey,
 			Message:  request.Body,
 			Title:    request.Title,
 		}
@@ -70,6 +74,14 @@ func (d DB) GetPostContent(postUUID string) (model.PostContent, error) {
 		return model.PostContent{}, postQuery.Error
 	}
 	return postContent, nil
+}
+
+func (d DB) GetPost(postUUID string) (model.Post, error) {
+	post := model.Post{}
+	if postQuery := d.db.Where("uuid = ?", postUUID).First(&post); postQuery.Error != nil {
+		return model.Post{}, postQuery.Error
+	}
+	return post, nil
 }
 
 func createDSN() string {
