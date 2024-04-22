@@ -2,7 +2,9 @@ package internal
 
 import (
 	"bytes"
+	"encoding/gob"
 	"errors"
+	"hash/fnv"
 	"html/template"
 	"time"
 
@@ -30,8 +32,7 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	// TODO fixme signatures arent deterministic. use hash(key, message)
-	postUUID, err := generateDeterministicUUID(request.Signature)
+	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Body)
 	if err != nil {
 		return "", err
 	}
@@ -71,6 +72,26 @@ func (r PostManager) FetchPostContent(postUUID string) (model.PostContent, error
 	return r.db.GetPostContent(postUUID)
 }
 
+// we use the base64 encoded signature to produce the deterministic (version 5) uuid
+func GenerateDeterministicUUID(key string, content string) (string, error) {
+	id, err := uuid.FromBytes([]byte(namespace)[:16])
+	if err != nil {
+		return "", err
+	}
+
+	buf := &bytes.Buffer{}
+	if err := gob.NewEncoder(buf).Encode([]string{key, content}); err != nil {
+		return "", err
+	}
+
+	h := fnv.New64()
+	if _, err = h.Write(buf.Bytes()); err != nil {
+		return "", err
+	}
+
+	return uuid.NewSHA1(id, h.Sum(nil)).String(), nil
+}
+
 func (r PostManager) toHTML(request model.PostRequest) (string, error) {
 	t, err := template.New("post").ParseFiles("templates/post")
 	if err != nil {
@@ -98,14 +119,4 @@ func parseRequest(request model.PostRequest) (map[string]any, error) {
 	}
 
 	return m, nil
-}
-
-// we use the base64 encoded signature to produce the deterministic (version 5) uuid
-func generateDeterministicUUID(signature string) (string, error) {
-	id, err := uuid.FromBytes([]byte(namespace)[:16])
-	if err != nil {
-		return "", err
-	}
-
-	return uuid.NewSHA1(id, []byte(signature)).String(), nil
 }
