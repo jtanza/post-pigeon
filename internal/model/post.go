@@ -24,9 +24,10 @@ type Post struct {
 
 type PostContent struct {
 	gorm.Model
-	ID        int
-	PostUUID  string
-	Title     string
-	HTML      string
-	Signature string
+	ID       int
+	PostUUID string
+	Title    string
+	HTML     string
+	Message  string
+	Key      string
 }

@@ -49,7 +49,7 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	if err = r.db.PersistPost(postUUID, request, html, request.Signature); err != nil {
+	if err = r.db.PersistPost(postUUID, request, html); err != nil {
 		return "", err
 	}
 
@@ -57,19 +57,21 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 }
 
 func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
-	content, err := r.db.GetPostFromSignature(request.Signature)
+	content, err := r.db.GetPostContent(request.UUID)
 	if err != nil {
 		return err
 	}
 
-	if len(content.Signature) == 0 {
+	if len(content.Key) == 0 {
 		// dont leak proof of a non-existent post
 		return errors.New("could not verify signature")
 	}
 
-	if content.Signature != request.Signature {
-		return errors.New("could not verify signature")
+	// https://crypto.stackexchange.com/q/111536/116199
+	if err = ValidateSignature(content.Key, request.Signature, content.Message); err != nil {
+		return errors.New("could not validate signature")
 	}
+
 	return r.db.DeletePost(request)
 }
 

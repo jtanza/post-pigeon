@@ -28,7 +28,7 @@ func NewDB() DB {
 	return DB{db}
 }
 
-func (d DB) PersistPost(postUUID string, request model.PostRequest, html string, signature string) error {
+func (d DB) PersistPost(postUUID string, request model.PostRequest, html string) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		post := model.Post{UUID: postUUID}
 		if postResult := tx.Create(&post); postResult.Error != nil {
@@ -36,10 +36,11 @@ func (d DB) PersistPost(postUUID string, request model.PostRequest, html string,
 		}
 
 		postLocation := model.PostContent{
-			PostUUID:  postUUID,
-			HTML:      html,
-			Signature: signature,
-			Title:     request.Title,
+			PostUUID: postUUID,
+			HTML:     html,
+			Key:      request.PublicKey,
+			Message:  request.Body,
+			Title:    request.Title,
 		}
 		if postLocationResult := tx.Create(&postLocation); postLocationResult.Error != nil {
 			return postLocationResult.Error
@@ -66,14 +67,6 @@ func (d DB) DeletePost(postDeleteRequest model.PostDeleteRequest) error {
 func (d DB) GetPostContent(postUUID string) (model.PostContent, error) {
 	postContent := model.PostContent{}
 	if postQuery := d.db.Where("post_uuid = ?", postUUID).First(&postContent); postQuery.Error != nil {
-		return model.PostContent{}, postQuery.Error
-	}
-	return postContent, nil
-}
-
-func (d DB) GetPostFromSignature(signature string) (model.PostContent, error) {
-	postContent := model.PostContent{}
-	if postQuery := d.db.Where("signature = ?", signature).First(&postContent); postQuery.Error != nil {
 		return model.PostContent{}, postQuery.Error
 	}
 	return postContent, nil
