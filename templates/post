@@ -18,7 +18,7 @@
       <h1 class="title is-2 is-spaced has-text-weight-bold">{{ .Title}}</h1>
         <h4 class="subtitle is-6">{{ .CreationDate }}</h4>
       <div class="content is-size-5 is-family-secondary">
-        <p>{{ .Body }}</p>
+        {{ .Body }}
       </div>
     </section>
   </div>

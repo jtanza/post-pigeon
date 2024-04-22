@@ -25,6 +25,20 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", errors.New("could not validate signature")
 	}
 
+	//b := "hello world\nhow are you"
+	//if b != request.Body {
+	//	log.Info(request.Body)
+	//	return "", errors.New(diff.Diff(request.Body, b))
+	//}
+	//
+	//if err := ValidateSignature(
+	//	request.PublicKey,
+	//	request.Signature,
+	//	b,
+	//); err != nil {
+	//	return "", err
+	//}
+
 	html, err := r.toHTML(request)
 	if err != nil {
 		return "", err
