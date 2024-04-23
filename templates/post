@@ -16,7 +16,11 @@
             <a class="mr-3">Documentation</a>
         </div>
       <h1 class="title is-2 is-spaced has-text-weight-bold">{{ .Title}}</h1>
-        <h4 class="subtitle is-6">{{ .CreationDate }}</h4>
+      <div class="mb-6">
+        <h4>{{ .CreationDate }}</h4>
+        <a href="/users/{{ .Fingerprint }}">{{ .Fingerprint }}</a>
+      </div>
+
       <div class="content is-size-5 is-family-secondary">
         {{ .Body }}
       </div>

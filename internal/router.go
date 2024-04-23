@@ -47,6 +47,8 @@ func (r Router) Engine() *echo.Echo {
 	e.POST("/posts", r.createPost)
 	e.DELETE("/posts", r.deletePost)
 
+	e.GET("/users/:fingerprint", r.getUserPosts)
+
 	return e
 }
 
@@ -99,6 +101,16 @@ func (r Router) deletePost(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusAccepted, request.UUID)
+}
+
+func (r Router) getUserPosts(c echo.Context) error {
+	id := c.Param("fingerprint")
+	posts, err := r.postManager.GetAllUserPosts(id)
+	if err != nil {
+		return err
+	}
+
+	return c.HTML(http.StatusOK, posts)
 }
 
 func customHTTPErrorHandler(e error, c echo.Context) {

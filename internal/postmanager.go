@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"hash/fnv"
 	"html/template"
 	"time"
@@ -27,7 +28,12 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", errors.New("could not validate signature")
 	}
 
-	html, err := r.toHTML(request)
+	m, err := parseRequest(request)
+	if err != nil {
+		return "", err
+	}
+
+	html, err := toHTML("post", m)
 	if err != nil {
 		return "", err
 	}
@@ -72,6 +78,26 @@ func (r PostManager) FetchPostContent(postUUID string) (model.PostContent, error
 	return r.db.GetPostContent(postUUID)
 }
 
+func (r PostManager) GetAllUserPosts(fingerprint string) (string, error) {
+	posts, err := r.db.GetUserPosts(fingerprint)
+	if err != nil {
+		return "", err
+	}
+
+	data := make([]map[string]interface{}, 0)
+	for _, p := range posts {
+		m := map[string]interface{}{
+			"Fingerprint": fingerprint,
+			"UUID":        p.UUID,
+			"Title":       p.Title,
+			"Date":        p.CreatedAt.Format(time.DateOnly),
+		}
+		data = append(data, m)
+	}
+
+	return toHTML("posts", data)
+}
+
 // we use the base64 encoded signature to produce the deterministic (version 5) uuid
 func GenerateDeterministicUUID(key string, content string) (string, error) {
 	id, err := uuid.FromBytes([]byte(namespace)[:16])
@@ -92,19 +118,14 @@ func GenerateDeterministicUUID(key string, content string) (string, error) {
 	return uuid.NewSHA1(id, h.Sum(nil)).String(), nil
 }
 
-func (r PostManager) toHTML(request model.PostRequest) (string, error) {
-	t, err := template.New("post").ParseFiles("templates/post")
-	if err != nil {
-		return "", err
-	}
-
-	m, err := parseRequest(request)
+func toHTML(templateName string, data any) (string, error) {
+	t, err := template.New(templateName).ParseFiles(fmt.Sprintf("templates/%s", templateName))
 	if err != nil {
 		return "", err
 	}
 
 	var buf bytes.Buffer
-	if err = t.Execute(&buf, m); err != nil {
+	if err = t.Execute(&buf, data); err != nil {
 		return "", err
 	}
 
@@ -112,9 +133,15 @@ func (r PostManager) toHTML(request model.PostRequest) (string, error) {
 }
 
 func parseRequest(request model.PostRequest) (map[string]any, error) {
+	fingerprint, err := Fingerprint(request.PublicKey)
+	if err != nil {
+		return nil, err
+	}
+
 	m := map[string]interface{}{
 		"Title":        request.Title,
 		"Body":         request.Body,
+		"Fingerprint":  fingerprint,
 		"CreationDate": time.Now().Format(time.DateOnly),
 	}
 

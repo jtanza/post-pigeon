@@ -2,6 +2,7 @@ package model
 
 import (
 	"gorm.io/gorm"
+	"time"
 )
 
 type PostRequest struct {
@@ -31,4 +32,14 @@ type PostContent struct {
 	Title    string
 	HTML     string
 	Message  string
+}
+
+type FullPost struct {
+	UUID        string
+	Key         string
+	Fingerprint string
+	Title       string
+	HTML        string
+	Message     string
+	CreatedAt   time.Time
 }

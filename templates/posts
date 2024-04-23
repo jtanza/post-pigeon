@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PostPigeon 🐦</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body>
+
+<div class="columns is-mobile">
+    <div class="column is-8 is-offset-2">
+        <section class="section">
+            <div class="mb-6">
+                <p style="display:inline" class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</p>
+                <a class="mr-3">Home</a>
+                <a class="mr-3">Documentation</a>
+            </div>
+            <h1 class="title is-2 is-spaced has-text-weight-bold">Posts</h1>
+            <p class="subtitle is-6">{{ (index . 0).Fingerprint }}</p>
+            <div class="mt-6">
+                <ul>
+                {{range $post := .}}
+                    <li><p class="mr-5" style="display:inline">{{ $post.Date }}</p><a href="/posts/{{ $post.UUID }}" class="is-size-5">{{ $post.Title }}</a></li>
+                {{end}}
+                </ul>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

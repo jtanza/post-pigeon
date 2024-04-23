@@ -49,5 +49,5 @@ func Fingerprint(pubKey string) (string, error) {
 
 	s := sha256.New()
 	s.Write(key)
-	return base64.RawStdEncoding.EncodeToString(s.Sum(nil)), nil
+	return base64.RawURLEncoding.EncodeToString(s.Sum(nil)), nil
 }
