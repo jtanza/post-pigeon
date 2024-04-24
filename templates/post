@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PostPigeon - {{ .Title }} </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
@@ -13,14 +14,26 @@
         <div class="mb-6">
             <p style="display:inline" class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</p>
             <a class="mr-3">Home</a>
+            <a href="/new" class="mr-3">New</a>
             <a class="mr-3">Documentation</a>
         </div>
       <h1 class="title is-2 is-spaced has-text-weight-bold">{{ .Title}}</h1>
-      <div class="mb-6">
-        <h4>{{ .CreationDate }}</h4>
-        <a href="/users/{{ .Fingerprint }}">{{ .Fingerprint }}</a>
-      </div>
-
+      <div class="mb-2">
+                  <span class="icon-text">
+                      <span class="icon">
+                          <i class="fas fa-clock"></i>
+                      </span>
+                      <span>{{ .CreationDate }}</span>
+                  </span>
+              </div>
+              <div class="mb-6">
+                  <span class="icon-text">
+                      <span class="icon">
+                          <i class="fas fa-user-circle"></i>
+                      </span>
+                      <span><a href="/users/{{ .Fingerprint }}">{{ .Fingerprint }}</a></span>
+                  </span>
+              </div>
       <div class="content is-size-5 is-family-secondary">
         {{ .Body }}
       </div>
