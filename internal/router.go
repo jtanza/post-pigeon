@@ -40,6 +40,7 @@ func (r Router) Engine() *echo.Echo {
 
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
+	e.Static("public", "./public")
 	e.File("/new", "public/new.html")
 	e.File("/delete", "public/delete.html")
 
@@ -106,7 +107,8 @@ func (r Router) deletePost(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusAccepted, request.UUID)
+	// TODO
+	return c.Redirect(http.StatusSeeOther, "/new")
 }
 
 func (r Router) getUserPosts(c echo.Context) error {

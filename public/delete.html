@@ -8,10 +8,7 @@
 </head>
 <body>
 
-<!-- form -->
-<!-- TODO DELETE doesnt work for forms. Need to send JSON request -->
-<!-- https://softwareengineering.stackexchange.com/questions/114156/why-are-there-no-put-and-delete-methods-on-html-forms -->
-<form id="foo" action="/posts" method="DELETE">
+<form id="foo" onsubmit="return sendDeletePost()">
     <section class="section">
         <div class="columns">
             <div class="column is-half is-offset-one-quarter">
@@ -33,7 +30,7 @@
 
                 <!-- Signature -->
                 <div class="field">
-                    <label class="label">Base64 Encoded Signature</label>
+                    <label class="label">Base64 Encoded Signature of Post</label>
                     <div class="control">
                         <label>
                             <textarea name="signature" class="textarea" placeholder="MIGIAkIA1kTl7BljHlrQ6uL04hGavPXWv+g1/NOBhPqRwldmg5pjPhC3YFxxnMtBNkfJcZJPxxNcsu9Ydr8KCej3wR+yHu4CQgH18fTvqze6qo3Z1q13m1Cjwz2BnFf9ZY6cPRLuIP6NIXsi0nbqeAHzcZqaayGa5Rm1ouzBCnCkAoxLn6hN0nT9vQ==" rows="4"></textarea>
@@ -43,7 +40,7 @@
 
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Submit</button>
+                        <button type="submit" id="deletepostbtn" class="button is-link">Delete</button>
                     </div>
                     <div class="control">
                         <button class="button is-link is-light">Cancel</button>
@@ -53,5 +50,6 @@
         </div>
     </section>
 </form>
+<script src="./public/script.js" type="text/javascript"></script>
 </body>
 </html>

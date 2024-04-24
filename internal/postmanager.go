@@ -61,12 +61,7 @@ func (r PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
 		return false, err
 	}
 
-	// a not-nil check on post as we dont return a pointer above
-	if post.UUID == postUUID {
-		return true, nil
-	}
-
-	return false, nil
+	return post != nil, nil
 }
 
 func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
@@ -75,12 +70,12 @@ func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
 		return err
 	}
 
-	if len(post.Key) == 0 {
+	if post == nil {
 		// dont leak proof of a non-existent post
 		return errors.New("could not verify signature")
 	}
 
-	content, err := r.db.GetPostContent(request.UUID)
+	content, err := r.db.GetPostContent(post.UUID)
 	if err != nil {
 		return err
 	}

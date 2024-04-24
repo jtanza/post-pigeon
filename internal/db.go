@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"log"
 
 	"github.com/jtanza/post-pigeon/internal/model"
@@ -76,12 +77,15 @@ func (d DB) GetPostContent(postUUID string) (model.PostContent, error) {
 	return postContent, nil
 }
 
-func (d DB) GetPost(postUUID string) (model.Post, error) {
-	post := model.Post{}
+func (d DB) GetPost(postUUID string) (*model.Post, error) {
+	var post model.Post
 	if postQuery := d.db.Where("uuid = ?", postUUID).First(&post); postQuery.Error != nil {
-		return model.Post{}, postQuery.Error
+		if errors.Is(postQuery.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, postQuery.Error
 	}
-	return post, nil
+	return &post, nil
 }
 
 func (d DB) GetUserPosts(fingerprint string) ([]model.FullPost, error) {
