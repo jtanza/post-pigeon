@@ -78,6 +78,12 @@ func (r Router) createPost(c echo.Context) error {
 	}
 	request.Body = body
 
+	if dupe, err := r.postManager.IsDuplicate(request); err != nil {
+		return err
+	} else if dupe {
+		return echo.NewHTTPError(http.StatusBadRequest, "Duplicate posts (same author, same content) are not allowed.")
+	}
+
 	uuid, err := r.postManager.CreatePost(request)
 	if err != nil {
 		return err

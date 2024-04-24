@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
 </head>
 <body>
@@ -22,7 +23,7 @@
                     <label class="label">Title</label>
                     <div class="control">
                         <label>
-                            <input name="title" class="input" type="text" placeholder="Text input">
+                            <input name="title" class="input" type="text" placeholder="My Post">
                         </label>
                     </div>
                 </div>
@@ -78,7 +79,7 @@
 
                 <!-- Signature -->
                 <div class="field">
-                    <label class="label">Base64 Encoded Signature</label>
+                    <label class="label">Base64 Encoded Signature of Post</label>
                     <div class="control">
                         <label>
                             <textarea name="signature" class="textarea" placeholder="MIGIAkIA1kTl7BljHlrQ6uL04hGavPXWv+g1/NOBhPqRwldmg5pjPhC3YFxxnMtBNkfJcZJPxxNcsu9Ydr8KCej3wR+yHu4CQgH18fTvqze6qo3Z1q13m1Cjwz2BnFf9ZY6cPRLuIP6NIXsi0nbqeAHzcZqaayGa5Rm1ouzBCnCkAoxLn6hN0nT9vQ==" rows="4"></textarea>
@@ -86,7 +87,7 @@
                     </div>
                 </div>
 
-                <label class="label">Content</label>
+                <label class="label">Plaintext Post</label>
                 <div class="file has-name">
                     <label class="file-label">
                         <input class="file-input" type="file" name="body" />
@@ -100,11 +101,9 @@
                     </label>
                 </div>
 
-
-
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Submit</button>
+                        <button type="submit" class="button is-link">Publish</button>
                     </div>
                     <div class="control">
                         <button class="button is-link is-light">Cancel</button>

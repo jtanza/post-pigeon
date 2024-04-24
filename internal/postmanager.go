@@ -50,6 +50,25 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 	return postUUID, err
 }
 
+func (r PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
+	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Body)
+	if err != nil {
+		return false, err
+	}
+
+	post, err := r.db.GetPost(postUUID)
+	if err != nil {
+		return false, err
+	}
+
+	// a not-nil check on post as we dont return a pointer above
+	if post.UUID == postUUID {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
 	post, err := r.db.GetPost(request.UUID)
 	if err != nil {

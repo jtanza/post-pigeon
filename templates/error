@@ -8,28 +8,22 @@
 </head>
 <body>
 
-<!-- navbar -->
-<nav class="navbar is-dark has-shadow" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a class="navbar-item" href="https://bulma.io">
-            PostPigeon
-            <!--<img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">-->
-        </a>
-    </div>
-    <div class="navbar-menu">
-        <div class="navbar-start">
-            <a class="navbar-item">About</a>
-        </div>
-    </div>
-</nav>
-
 <!-- Content -->
 <div class="columns is-mobile">
   <div class="column is-8 is-offset-2">
     <section class="section">
-      <h1 class="title">{{ .Status}}</h1>
+    <div class="mb-6">
+      <p style="display:inline" class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</p>
+      <a class="mr-3">Home</a>
+      <a href="/new" class="mr-3">New</a>
+      <a class="mr-3">Documentation</a>
+    </div>
+      <h1 class="title">Encountered Error</h1>
+      <p class="is-size-5"><strong>Status:</strong> {{ .Status}}</p>
+      <p class="is-size-5"><strong>Error:</strong> {{ .Error }}</p>
+      <br>
+      <p>If you believe this is a mistake, or need help reach out at <a href="mailto:someone@example.com">j@t.com</a></p>
     </section>
-    <p>{{ .Error }}</p>
   </div>
 </div>
 </body>
