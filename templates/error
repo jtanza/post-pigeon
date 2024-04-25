@@ -18,11 +18,10 @@
       <a href="/new" class="mr-3">New</a>
       <a class="mr-3">Documentation</a>
     </div>
-      <h1 class="title">Encountered Error</h1>
-      <p class="is-size-5"><strong>Status:</strong> {{ .Status}}</p>
-      <p class="is-size-5"><strong>Error:</strong> {{ .Error }}</p>
-      <br>
-      <p>If you believe this is a mistake, or need help reach out at <a href="mailto:someone@example.com">j@t.com</a></p>
+      <h1 class="title">Error</h1>
+      <p class="is-size-4"><strong>{{ .Status}}</strong></p>
+      <p class="is-size-4">{{ .Error }}</p>
+      <p class="mt-6">If you believe this is a mistake, or need help reach out at <a href="mailto:someone@example.com">j@t.com</a></p>
     </section>
   </div>
 </div>

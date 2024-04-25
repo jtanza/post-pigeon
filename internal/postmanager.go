@@ -64,6 +64,22 @@ func (r PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
 	return post != nil, nil
 }
 
+func (r PostManager) HasPosts(fingerprint string) (bool, error) {
+	posts, err := r.db.GetUserPosts(fingerprint)
+	if err != nil {
+		return false, err
+	}
+	return len(posts) > 0, nil
+}
+
+func (r PostManager) IsPost(uuid string) (bool, error) {
+	post, err := r.db.GetPost(uuid)
+	if err != nil {
+		return false, err
+	}
+	return post != nil, nil
+}
+
 func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
 	post, err := r.db.GetPost(request.UUID)
 	if err != nil {

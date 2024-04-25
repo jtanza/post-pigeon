@@ -55,6 +55,15 @@ func (r Router) Engine() *echo.Echo {
 
 func (r Router) getPost(c echo.Context) error {
 	id := c.Param("uuid")
+
+	exists, err := r.postManager.IsPost(id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+
 	postContent, err := r.postManager.FetchPostContent(id)
 	if err != nil {
 		return err
@@ -113,6 +122,15 @@ func (r Router) deletePost(c echo.Context) error {
 
 func (r Router) getUserPosts(c echo.Context) error {
 	id := c.Param("fingerprint")
+
+	exists, err := r.postManager.HasPosts(id)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+
 	posts, err := r.postManager.GetAllUserPosts(id)
 	if err != nil {
 		return err
@@ -122,13 +140,20 @@ func (r Router) getUserPosts(c echo.Context) error {
 }
 
 func customHTTPErrorHandler(e error, c echo.Context) {
+	errorMessage := e.Error()
 	code := http.StatusInternalServerError
 	if he, ok := e.(*echo.HTTPError); ok {
+		// TODO case for others
+		if he.Code == http.StatusNotFound {
+			errorMessage = "The page you are looking for does not exist"
+		} else {
+			errorMessage = fmt.Sprintf("%s", he.Message)
+		}
 		code = he.Code
 	}
 	c.Logger().Error(e)
 
-	h, err := errorHTML(e, code)
+	h, err := errorHTML(errorMessage, code)
 	if err != nil {
 		c.Logger().Error(err)
 	}
@@ -138,14 +163,14 @@ func customHTTPErrorHandler(e error, c echo.Context) {
 	}
 }
 
-func errorHTML(e error, code int) (string, error) {
+func errorHTML(e string, code int) (string, error) {
 	t, err := template.New("error").ParseFiles("templates/error")
 	if err != nil {
 		return "", err
 	}
 
 	m := map[string]interface{}{
-		"Error":  e.Error(),
+		"Error":  e,
 		"Status": code,
 	}
 
