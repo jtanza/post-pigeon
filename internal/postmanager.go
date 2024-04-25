@@ -43,7 +43,7 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	if err = r.db.PersistPost(postUUID, request, html); err != nil {
+	if err = r.db.PersistPost(postUUID, request, html, ParseExpiration(request.Expiration)); err != nil {
 		return "", err
 	}
 
@@ -146,6 +146,23 @@ func GenerateDeterministicUUID(key string, content string) (string, error) {
 	}
 
 	return uuid.NewSHA1(id, h.Sum(nil)).String(), nil
+}
+
+func ParseExpiration(expirationRequest string) *time.Time {
+	expiration := time.Now().UTC()
+	switch expirationRequest {
+	case "1 hour":
+		expiration = expiration.Add(time.Hour)
+	case "1 day":
+		expiration = expiration.AddDate(0, 0, 1)
+	case "1 month":
+		expiration = expiration.AddDate(0, 1, 0)
+	case "1 year":
+		expiration = expiration.AddDate(1, 0, 0)
+	default:
+		return nil
+	}
+	return &expiration
 }
 
 func toHTML(templateName string, data any) (string, error) {

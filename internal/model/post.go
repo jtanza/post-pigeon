@@ -6,10 +6,11 @@ import (
 )
 
 type PostRequest struct {
-	Title     string `form:"title" validate:"required"`
-	Body      string
-	PublicKey string `form:"publickey" validate:"required"`
-	Signature string `form:"signature" validate:"required"`
+	Title      string `form:"title" validate:"required"`
+	Body       string
+	PublicKey  string `form:"publickey" validate:"required"`
+	Signature  string `form:"signature" validate:"required"`
+	Expiration string `form:"expiration"`
 }
 
 type PostDeleteRequest struct {
@@ -23,6 +24,7 @@ type Post struct {
 	UUID        string
 	Key         string
 	Fingerprint string
+	ExpiresAt   *time.Time
 }
 
 type PostContent struct {

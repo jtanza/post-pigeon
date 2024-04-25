@@ -3,6 +3,7 @@ package internal
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/jtanza/post-pigeon/internal/model"
 	"gorm.io/driver/sqlite"
@@ -29,14 +30,14 @@ func NewDB() DB {
 	return DB{db}
 }
 
-func (d DB) PersistPost(postUUID string, request model.PostRequest, html string) error {
+func (d DB) PersistPost(postUUID string, request model.PostRequest, html string, expiration *time.Time) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		fingerprint, err := Fingerprint(request.PublicKey)
 		if err != nil {
 			return err
 		}
 
-		post := model.Post{UUID: postUUID, Key: request.PublicKey, Fingerprint: fingerprint}
+		post := model.Post{UUID: postUUID, Key: request.PublicKey, Fingerprint: fingerprint, ExpiresAt: expiration}
 		if postResult := tx.Create(&post); postResult.Error != nil {
 			return postResult.Error
 		}

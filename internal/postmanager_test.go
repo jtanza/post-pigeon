@@ -40,3 +40,9 @@ func TestGenerateDeterministicUUIDUnique(t *testing.T) {
 		t.Error("uuids are not unique for different inputs")
 	}
 }
+
+func TestParseExpiration(t *testing.T) {
+	if expiration := ParseExpiration("junk"); expiration != nil {
+		t.Error("non standard expirations should return nil")
+	}
+}

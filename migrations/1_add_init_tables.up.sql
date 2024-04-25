@@ -3,6 +3,7 @@ create table post (
     uuid        text unique not null,
     fingerprint text not null,
     key         text not null,
+    expires_at  datetime,
     created_at  datetime,
     updated_at  datetime,
     deleted_at  datetime
