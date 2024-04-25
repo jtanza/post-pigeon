@@ -8,8 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
-	"fmt"
-	"strings"
 )
 
 func ValidateSignature(rawPubKey string, base64EncodedSignature string, message string) error {
@@ -37,17 +35,14 @@ func ValidateSignature(rawPubKey string, base64EncodedSignature string, message 
 	return nil
 }
 
-// TODO
-func Fingerprint(pubKey string) (string, error) {
-	parts := strings.Split(pubKey, "\n")
-	base64Parts := parts[1 : len(parts)-1]
-
-	key, err := base64.StdEncoding.DecodeString(strings.Join(base64Parts, ""))
-	if err != nil {
-		return "", fmt.Errorf("can not parse key %s", err)
+func Fingerprint(rawPubKey string) (string, error) {
+	block, _ := pem.Decode([]byte(rawPubKey))
+	if block == nil {
+		return "", errors.New("invalid PEM block")
 	}
 
 	s := sha256.New()
-	s.Write(key)
-	return base64.RawURLEncoding.EncodeToString(s.Sum(nil)), nil
+	s.Write(block.Bytes)
+
+	return base64.URLEncoding.EncodeToString(s.Sum(nil)), nil
 }

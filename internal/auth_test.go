@@ -51,8 +51,20 @@ func TestValidateSignatureVerifiesValidMessageNewline(t *testing.T) {
 	}
 }
 
-func TestFingerprint(t *testing.T) {
-	if id, err := internal.Fingerprint(pubKey); id != "FInWS6T+2/tTfzCteUyK0rQJelfKw7b9vhD6QlFiaoM" {
+func TestFingerprintValid(t *testing.T) {
+	id, err := internal.Fingerprint(pubKey)
+	if err != nil {
+		t.Error(err)
+	}
+
+	expected := "FInWS6T-2_tTfzCteUyK0rQJelfKw7b9vhD6QlFiaoM="
+	if id != expected {
+		t.Errorf("expected %s got %s", expected, id)
+	}
+}
+
+func TestFingerprintInValid(t *testing.T) {
+	if _, err := internal.Fingerprint("not a public key"); err == nil {
 		t.Error(err)
 	}
 }
