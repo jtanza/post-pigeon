@@ -41,6 +41,7 @@ func (r Router) Engine() *echo.Echo {
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	e.Static("public", "./public")
+	e.File("/", "public/index.html")
 	e.File("/new", "public/new.html")
 	e.File("/delete", "public/delete.html")
 

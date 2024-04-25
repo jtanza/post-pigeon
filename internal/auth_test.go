@@ -63,7 +63,7 @@ func TestFingerprintValid(t *testing.T) {
 	}
 }
 
-func TestFingerprintInValid(t *testing.T) {
+func TestFingerprintInvalid(t *testing.T) {
 	if _, err := internal.Fingerprint("not a public key"); err == nil {
 		t.Error(err)
 	}

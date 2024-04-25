@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+</head>
+<body>
+<section class="section">
+    <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+            <div class="mb-6">
+                <p style="display:inline" class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</p>
+                <a class="mr-3">Home</a>
+                <a href="/new" class="mr-3">New</a>
+                <a href="/delete" class="mr-3">Delete</a>
+            </div>
+            <div class="content">
+                <h1>Post Pigeon</h1>
+                <p>Hi There.</p>
+
+                <h3>Some Helpful Commands</h3>
+                <p>Below is the docs. You'll need openssl etc</p>
+
+                <h5>Generating Keys</h5>
+                <p>Post Pigeon uses ECDSA keys exclusively. To use Post Pigeon you must use an ECDSA keys</p>
+                <pre>$ # generate your private key&#13;&#10;$ openssl ecparam -name secp521r1 -genkey -noout -out postpigeon-priv-key.pem&#13;&#10;$ # generate your public key from your private key&#13;&#10;$ openssl ec -in postpigeon-priv-key.pem -pubout > postpigeon-pub-key.pem</pre>
+
+                <h5>Preparing a post</h5>
+                <p>In order to submit a post on Post Pigeon we need the Base64 encoded digital signature</p>
+                <pre>$ # write your post&#13;&#10;$ echo -n "This is my first post" > data.txt&#13;&#10;$ # create your signature&#13;&#10;$ openssl dgst -sha1 -sign postpigeon-priv-key.pem < data.txt > data.sig&#13;&#10;$ # base64 encode the signature&#13;&#10;$ cat data.sig | base64</pre>
+
+                <h5>Verify your Signature</h5>
+                <p>If you'd like, you can verify the signature of your to-be-published post after you've created it</p>
+                <pre>$ openssl dgst -sha1 -verify postpigeon-pub-key.pem -signature data.sig < data.txt&#13;&#10;Verified OK</pre>
+
+                <h5>Generate the Fingerprint of your Public Key</h5>
+                <p>Post Pigeon relies on the fingerprint of your key for lots of things. It's best to think of it as your username</p>
+                <p>The command below simply parses your key from your .pem, calculates the sha256 and Base64 encodes in a URL safe way</p>
+                <pre>$ cat postpigeon-pub-key.pem | sed '1,1d' | sed '$ d' | tr -d '\n' | base64 --decode | sha256sum | xxd -r -p | basenc --base64url&#13;&#10;FInWS6T-2_tTfzCteUyK0rQJelfKw7b9vhD6QlFiaoM=</pre>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
