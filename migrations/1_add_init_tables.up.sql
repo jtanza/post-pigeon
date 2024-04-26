@@ -20,7 +20,7 @@ create table post_content (
   created_at datetime,
   updated_at datetime,
   deleted_at datetime,
-  foreign key(post_uuid) references post(uuid)
+  foreign key(post_uuid) references post(uuid) on delete cascade
 );
 create index post_content_uuid_idx on post_content(post_uuid);
 

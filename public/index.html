@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hello Bulma!</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐦</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
 </head>
@@ -19,9 +20,31 @@
             </div>
             <div class="content">
                 <h1>Post Pigeon</h1>
-                <p>Hi There.</p>
+                <p>Post Pigeon is a site that allows you to create and share posts with other people.</p>
+                <p>You could use it to write a <a>blog post</a>, share a <a>poem</a>, a <a>recipe</a> or whatever else you care to.</p>
+                <p>Neither you or anyone you share with needs an account to publish or view content. In fact, there are no accounts on Post Pigeon.</p>
+                <p>We dont track you (there's no javascript in use), or provide any way to engage with content. With Post Pigeon you can write a post, share it with others and delete it. That's it. </p>
+                <p>The code is open source and you can find it <a>here</a></p>
 
-                <h3>Some Helpful Commands</h3>
+                <br>
+                <h2>How it Works</h2>
+                <p>Post Pigeon is composed of two features: creating posts and deleting them.</p>
+                <p>Both these actions are done without a user account.</p>
+                <p>All "authentication" is achieved through delegation to digital signatures. Whoever holds the keys used to generate the signature of a post is the owner of it. That is, even without a user login mechanism <strong>only the author of a post will be able to delete it or claim authorship of it.</strong><sup><a>[1]</a></sup></p>
+
+                <h5>Creating a Post</h5>
+                <p>To publish a post users will need to either <a>generate new keys</a>, or use an existing pair to <a>sign their post content</a>.</p>
+                <p>Once the signature has been created, the key, along with the signed content and the plaintext post can be <a href="/new">published</a>.</p>
+
+                <p>Behind the scenes, we ensure the signature is valid, generate and store some HTML and publish your post to Post Pigeon for you to share.</p>
+
+                <h5>Deleting a Post</h5>
+                <p>To delete a post, simply re-sign the original, <strong>unaltered</strong> post content <strong>with the same key used to originally sign it</strong> and <a href="/delete">provide</a> the post UUID and signed content.</p>
+                <p>It should be made explicit here: if you lose the original key pair used to first sign the post <strong>you will not be able to later delete it.</strong></p>
+                <p>Given this we provide an option to set an expiration value when fist publishing your post. If this value is set, it will be auto-deleted when that expiration is met. <strong>Strongly consider this option if you are apt to lose your keys.</strong></p>
+
+                <br>
+                <h2>Some Helpful Commands</h2>
                 <p>Below is the docs. You'll need openssl etc</p>
 
                 <h5>Generating Keys</h5>
@@ -40,6 +63,21 @@
                 <p>Post Pigeon relies on the fingerprint of your key for lots of things. It's best to think of it as your username</p>
                 <p>The command below simply parses your key from your .pem, calculates the sha256 and Base64 encodes in a URL safe way</p>
                 <pre>$ cat postpigeon-pub-key.pem | sed '1,1d' | sed '$ d' | tr -d '\n' | base64 --decode | sha256sum | xxd -r -p | basenc --base64url&#13;&#10;FInWS6T-2_tTfzCteUyK0rQJelfKw7b9vhD6QlFiaoM=</pre>
+
+                <br>
+                <h2>Some Technical Considerations</h2>
+                <h5>UUIDS</h5>
+                <p>UUIDs of posts are deterministically generated from the post content and the authors public key. This means if you delete a post and re-create it with the same key, you get the same UUID. Essentially this allows for edits of a post ensuring the same UUID can be used to share the new, edited content.</p>
+                <p>This also means that if you try to publish the same post twice (with the same key) you get a 4xx. Said differently, no duplicate posts are allowed.</p>
+
+                <h5>Deletion</h5>
+                <p>When we save a post, we store along with it the original content message and the public key used. This is done intentionally, so that on delete we use the <strong>stored</strong> public key of the requested post to verify the signed message. This means that only the user who originally authored the post with the stored key can delete it.</p>
+
+                <h5>The actual content</h5>
+                <p>All posts are plain old HTML. No javascript of any sort is called when you make a requests to <code>/posts/{uuid}</code></p>
+
+                <h5>Source</h5>
+                <p>The code is hosted on <a>github.</a></p>
             </div>
         </div>
     </div>

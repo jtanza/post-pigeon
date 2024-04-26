@@ -97,6 +97,14 @@ func (d DB) GetUserPosts(fingerprint string) ([]model.FullPost, error) {
 	return posts, nil
 }
 
+func (d DB) DeleteExpiredPosts() (int64, error) {
+	postQuery := d.db.Unscoped().Model(&model.Post{}).Where("expires_at <= date('now')").Delete(&model.Post{})
+	if postQuery.Error != nil {
+		return 0, postQuery.Error
+	}
+	return postQuery.RowsAffected, nil
+}
+
 func createDSN() string {
 	// https://github.com/mattn/go-sqlite3?tab=readme-ov-file#dsn-examples
 	// file:test.db?cache=shared&mode=memory
