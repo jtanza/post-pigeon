@@ -36,6 +36,8 @@ func (r Router) Engine() *echo.Echo {
 	e := echo.New()
 
 	e.Use(middleware.Logger())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	e.HTTPErrorHandler = customHTTPErrorHandler
@@ -117,7 +119,6 @@ func (r Router) deletePost(c echo.Context) error {
 		return err
 	}
 
-	// TODO
 	return c.Redirect(http.StatusSeeOther, "/new")
 }
 

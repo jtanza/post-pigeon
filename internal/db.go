@@ -98,7 +98,7 @@ func (d DB) GetUserPosts(fingerprint string) ([]model.FullPost, error) {
 }
 
 func (d DB) DeleteExpiredPosts() (int64, error) {
-	postQuery := d.db.Unscoped().Model(&model.Post{}).Where("expires_at <= date('now')").Delete(&model.Post{})
+	postQuery := d.db.Unscoped().Model(&model.Post{}).Where("expires_at <= datetime('now')").Delete(&model.Post{})
 	if postQuery.Error != nil {
 		return 0, postQuery.Error
 	}
