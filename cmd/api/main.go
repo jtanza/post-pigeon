@@ -1,16 +1,20 @@
 package main
 
 import (
+	"github.com/bluele/gcache"
 	"github.com/jtanza/post-pigeon/internal"
 	"github.com/labstack/gommon/log"
 	"time"
 )
 
+const cacheSize = 50
+
 func main() {
 	db := internal.NewDB()
 	go postReaper(db)
 
-	r := internal.NewRouter(db, internal.NewPostManager(db)).Engine()
+	cache := gcache.New(cacheSize).LRU().Build()
+	r := internal.NewRouter(db, internal.NewPostManager(db, cache)).Engine()
 	r.Logger.Fatal(r.Start(":8080"))
 }
 

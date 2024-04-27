@@ -70,12 +70,15 @@ func (d DB) DeletePost(postDeleteRequest model.PostDeleteRequest) error {
 	})
 }
 
-func (d DB) GetPostContent(postUUID string) (model.PostContent, error) {
-	postContent := model.PostContent{}
+func (d DB) GetPostContent(postUUID string) (*model.PostContent, error) {
+	var postContent model.PostContent
 	if postQuery := d.db.Where("post_uuid = ?", postUUID).First(&postContent); postQuery.Error != nil {
-		return model.PostContent{}, postQuery.Error
+		if errors.Is(postQuery.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, postQuery.Error
 	}
-	return postContent, nil
+	return &postContent, nil
 }
 
 func (d DB) GetPost(postUUID string) (*model.Post, error) {

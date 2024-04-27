@@ -59,17 +59,12 @@ func (r Router) Engine() *echo.Echo {
 func (r Router) getPost(c echo.Context) error {
 	id := c.Param("uuid")
 
-	exists, err := r.postManager.IsPost(id)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
-
 	postContent, err := r.postManager.FetchPostContent(id)
 	if err != nil {
 		return err
+	}
+	if postContent == nil {
+		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
 	return c.HTML(http.StatusOK, postContent.HTML)
@@ -153,7 +148,7 @@ func customHTTPErrorHandler(e error, c echo.Context) {
 		}
 		code = he.Code
 	}
-	c.Logger().Error(e)
+	c.Logger().Warn(e)
 
 	h, err := errorHTML(errorMessage, code)
 	if err != nil {

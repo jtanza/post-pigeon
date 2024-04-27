@@ -5,6 +5,8 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"github.com/bluele/gcache"
+	"github.com/labstack/gommon/log"
 	"hash/fnv"
 	"html/template"
 	"time"
@@ -16,11 +18,12 @@ import (
 const namespace = "post-pigeon-namespace"
 
 type PostManager struct {
-	db DB
+	db    DB
+	cache gcache.Cache
 }
 
-func NewPostManager(db DB) PostManager {
-	return PostManager{db}
+func NewPostManager(db DB, cache gcache.Cache) PostManager {
+	return PostManager{db, cache}
 }
 
 func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
@@ -72,14 +75,6 @@ func (r PostManager) HasPosts(fingerprint string) (bool, error) {
 	return len(posts) > 0, nil
 }
 
-func (r PostManager) IsPost(uuid string) (bool, error) {
-	post, err := r.db.GetPost(uuid)
-	if err != nil {
-		return false, err
-	}
-	return post != nil, nil
-}
-
 func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
 	post, err := r.db.GetPost(request.UUID)
 	if err != nil {
@@ -101,11 +96,30 @@ func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
 		return errors.New("could not validate signature")
 	}
 
+	r.cache.Remove(post.UUID)
 	return r.db.DeletePost(request)
 }
 
-func (r PostManager) FetchPostContent(postUUID string) (model.PostContent, error) {
-	return r.db.GetPostContent(postUUID)
+func (r PostManager) FetchPostContent(postUUID string) (*model.PostContent, error) {
+	if r.cache.Has(postUUID) {
+		post, err := r.cache.Get(postUUID)
+		if err != nil {
+			log.Error(err)
+		} else {
+			log.Infof("serving post %s from cache. hit rate: %f", postUUID, r.cache.HitRate())
+			return post.(*model.PostContent), nil
+		}
+	}
+
+	post, err := r.db.GetPostContent(postUUID)
+	if err != nil {
+		return nil, err
+	}
+	if err = r.cache.Set(postUUID, post); err != nil {
+		log.Error(err)
+	}
+
+	return post, nil
 }
 
 func (r PostManager) GetAllUserPosts(fingerprint string) (string, error) {
