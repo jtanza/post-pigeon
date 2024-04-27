@@ -13,17 +13,16 @@
     <div class="columns">
         <div class="column is-half is-offset-one-quarter">
             <div class="mb-6">
-                <p style="display:inline" class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</p>
-                <a class="mr-3">Home</a>
+                <p style="display:inline" class="has-text-weight-bold mr-3 "><a style="color:black;" href="/">Post Pigeon 🐦</a></p>
                 <a href="/new" class="mr-3">New</a>
                 <a href="/delete" class="mr-3">Delete</a>
             </div>
             <div class="content">
                 <h1>Post Pigeon</h1>
                 <p>Post Pigeon is a site that allows you to create and share posts with other people.</p>
-                <p>You could use it to write a <a>blog post</a>, share a <a>poem</a>, a <a>recipe</a> or whatever else you care to.</p>
-                <p>Neither you or anyone you share with needs an account to publish or view content. In fact, there are no accounts on Post Pigeon.</p>
-                <p>We dont track you (there's no javascript in use), or provide any way to engage with content. With Post Pigeon you can write a post, share it with others and delete it. That's it. </p>
+                <p>You could use it to write a <a>blog post</a>, share a <a>recipe</a>, publish a <a>poem</a> or whatever else you care to.</p>
+                <p>Neither you or anyone you share your post with needs an account to publish or view content. In fact, there are no accounts on Post Pigeon.</p>
+                <p>We dont track you (there's no javascript in use), and there's no way to promote any content. With Post Pigeon you can write a post, share it with others, and delete it. That's it. </p>
                 <p>The code is open source and you can find it <a>here</a></p>
 
                 <br>
@@ -40,12 +39,13 @@
 
                 <h5>Deleting a Post</h5>
                 <p>To delete a post, simply re-sign the original, <strong>unaltered</strong> post content <strong>with the same key used to originally sign it</strong> and <a href="/delete">provide</a> the post UUID and signed content.</p>
-                <p>It should be made explicit here: if you lose the original key pair used to first sign the post <strong>you will not be able to later delete it.</strong></p>
-                <p>Given this we provide an option to set an expiration value when fist publishing your post. If this value is set, it will be auto-deleted when that expiration is met. <strong>Strongly consider this option if you are apt to lose your keys.</strong></p>
+                <p>It should be made explicit here: if you lose the original key pair used to first sign the post <strong>you will not be able to delete it.</strong></p>
+                <p>Given this, we provide an option to set an expiration value when fist publishing your post. If this value is set, it will be auto-deleted when that expiration is met. <strong>Strongly consider this option if you are apt to lose your keys.</strong></p>
 
                 <br>
                 <h2>Some Helpful Commands</h2>
-                <p>Below is the docs. You'll need openssl etc</p>
+                <p>Below are a few commands you can use to help prepare a post for upload.</p>
+                <p>Prerequisites include <code>openssl</code>, <code>base64</code>, <code>basenc</code>, and <code>sha256sum</code>. All others <i>should</i> already be on your system.</p>
 
                 <h5>Generating Keys</h5>
                 <p>Post Pigeon uses ECDSA keys exclusively. To use Post Pigeon you must use an ECDSA keys</p>
@@ -66,8 +66,11 @@
 
                 <br>
                 <h2>Some Technical Considerations</h2>
+                <h5>KeyPairs</h5>
+                <p>Something</p>
+
                 <h5>UUIDS</h5>
-                <p>UUIDs of posts are deterministically generated from the post content and the authors public key. This means if you delete a post and re-create it with the same key, you get the same UUID. Essentially this allows for edits of a post ensuring the same UUID can be used to share the new, edited content.</p>
+                <p>UUIDs of posts are deterministically generated from the post content and the authors public key. This means if you delete a post and re-create it with the same key, you get the same UUID.</p>
                 <p>This also means that if you try to publish the same post twice (with the same key) you get a 4xx. Said differently, no duplicate posts are allowed.</p>
 
                 <h5>Deletion</h5>

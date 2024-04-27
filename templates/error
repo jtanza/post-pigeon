@@ -13,10 +13,9 @@
   <div class="column is-8 is-offset-2">
     <section class="section">
     <div class="mb-6">
-      <p style="display:inline" class="has-text-weight-bold mr-3 ">Post Pigeon 🐦</p>
-      <a class="mr-3">Home</a>
+      <p style="display:inline" class="has-text-weight-bold mr-3 "><a style="color:black;" href="/">Post Pigeon 🐦</a></p>
       <a href="/new" class="mr-3">New</a>
-      <a class="mr-3">Documentation</a>
+      <a href="/delete" class="mr-3">Delete</a>
     </div>
       <h1 class="title">Error</h1>
       <p class="is-size-4"><strong>{{ .Status}}</strong></p>
