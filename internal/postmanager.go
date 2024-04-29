@@ -6,7 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bluele/gcache"
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 	"github.com/labstack/gommon/log"
+	"github.com/microcosm-cc/bluemonday"
 	"hash/fnv"
 	"html/template"
 	"time"
@@ -18,25 +22,27 @@ import (
 const namespace = "post-pigeon-namespace"
 
 type PostManager struct {
-	db    DB
-	cache gcache.Cache
+	db             DB
+	cache          gcache.Cache
+	markdownParser *parser.Parser
 }
 
 func NewPostManager(db DB, cache gcache.Cache) PostManager {
-	return PostManager{db, cache}
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
+	return PostManager{db, cache, parser.NewWithExtensions(extensions)}
 }
 
-func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
+func (pm PostManager) CreatePost(request model.PostRequest) (string, error) {
 	if err := ValidateSignature(request.PublicKey, request.Signature, request.Body); err != nil {
 		return "", errors.New("could not validate signature")
 	}
 
-	m, err := parseRequest(request)
+	m, err := pm.formatRequestData(request)
 	if err != nil {
 		return "", err
 	}
 
-	html, err := toHTML("post", m)
+	renderedHTML, err := toHTML("post", m)
 	if err != nil {
 		return "", err
 	}
@@ -46,20 +52,20 @@ func (r PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	if err = r.db.PersistPost(postUUID, request, html, ParseExpiration(request.Expiration)); err != nil {
+	if err = pm.db.PersistPost(postUUID, request, renderedHTML, ParseExpiration(request.Expiration)); err != nil {
 		return "", err
 	}
 
 	return postUUID, err
 }
 
-func (r PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
+func (pm PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
 	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Body)
 	if err != nil {
 		return false, err
 	}
 
-	post, err := r.db.GetPost(postUUID)
+	post, err := pm.db.GetPost(postUUID)
 	if err != nil {
 		return false, err
 	}
@@ -67,16 +73,16 @@ func (r PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
 	return post != nil, nil
 }
 
-func (r PostManager) HasPosts(fingerprint string) (bool, error) {
-	posts, err := r.db.GetUserPosts(fingerprint)
+func (pm PostManager) HasPosts(fingerprint string) (bool, error) {
+	posts, err := pm.db.GetUserPosts(fingerprint)
 	if err != nil {
 		return false, err
 	}
 	return len(posts) > 0, nil
 }
 
-func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
-	post, err := r.db.GetPost(request.UUID)
+func (pm PostManager) RemovePost(request model.PostDeleteRequest) error {
+	post, err := pm.db.GetPost(request.UUID)
 	if err != nil {
 		return err
 	}
@@ -86,7 +92,7 @@ func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
 		return errors.New("could not verify signature")
 	}
 
-	content, err := r.db.GetPostContent(post.UUID)
+	content, err := pm.db.GetPostContent(post.UUID)
 	if err != nil {
 		return err
 	}
@@ -96,34 +102,34 @@ func (r PostManager) RemovePost(request model.PostDeleteRequest) error {
 		return errors.New("could not validate signature")
 	}
 
-	r.cache.Remove(post.UUID)
-	return r.db.DeletePost(request)
+	pm.cache.Remove(post.UUID)
+	return pm.db.DeletePost(request)
 }
 
-func (r PostManager) FetchPostContent(postUUID string) (*model.PostContent, error) {
-	if r.cache.Has(postUUID) {
-		post, err := r.cache.Get(postUUID)
+func (pm PostManager) FetchPostContent(postUUID string) (*model.PostContent, error) {
+	if pm.cache.Has(postUUID) {
+		post, err := pm.cache.Get(postUUID)
 		if err != nil {
 			log.Error(err)
 		} else {
-			log.Infof("serving post %s from cache. hit rate: %f", postUUID, r.cache.HitRate())
+			log.Infof("serving post %s from cache. hit rate: %f", postUUID, pm.cache.HitRate())
 			return post.(*model.PostContent), nil
 		}
 	}
 
-	post, err := r.db.GetPostContent(postUUID)
+	post, err := pm.db.GetPostContent(postUUID)
 	if err != nil {
 		return nil, err
 	}
-	if err = r.cache.Set(postUUID, post); err != nil {
+	if err = pm.cache.Set(postUUID, post); err != nil {
 		log.Error(err)
 	}
 
 	return post, nil
 }
 
-func (r PostManager) GetAllUserPosts(fingerprint string) (string, error) {
-	posts, err := r.db.GetUserPosts(fingerprint)
+func (pm PostManager) GetAllUserPosts(fingerprint string) (string, error) {
+	posts, err := pm.db.GetUserPosts(fingerprint)
 	if err != nil {
 		return "", err
 	}
@@ -193,15 +199,19 @@ func toHTML(templateName string, data any) (string, error) {
 	return buf.String(), nil
 }
 
-func parseRequest(request model.PostRequest) (map[string]any, error) {
+func (pm PostManager) formatRequestData(request model.PostRequest) (map[string]any, error) {
 	fingerprint, err := Fingerprint(request.PublicKey)
 	if err != nil {
 		return nil, err
 	}
 
+	md := pm.markdownParser.Parse([]byte(request.Body))
+	renderer := html.NewRenderer(html.RendererOptions{Flags: html.CommonFlags | html.HrefTargetBlank})
+	sanitizedBody := bluemonday.UGCPolicy().SanitizeBytes(markdown.Render(md, renderer))
+
 	m := map[string]interface{}{
 		"Title":        request.Title,
-		"Body":         request.Body,
+		"Body":         template.HTML(sanitizedBody),
 		"Fingerprint":  fingerprint,
 		"CreationDate": time.Now().Format(time.DateOnly),
 	}

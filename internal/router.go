@@ -120,11 +120,9 @@ func (r Router) deletePost(c echo.Context) error {
 func (r Router) getUserPosts(c echo.Context) error {
 	id := c.Param("fingerprint")
 
-	exists, err := r.postManager.HasPosts(id)
-	if err != nil {
+	if exists, err := r.postManager.HasPosts(id); err != nil {
 		return err
-	}
-	if !exists {
+	} else if !exists {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
