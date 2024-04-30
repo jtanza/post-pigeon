@@ -36,10 +36,7 @@ func NewRouter(db DB, postCreator PostManager) Router {
 func (r Router) Engine(logFile *os.File) *echo.Echo {
 	e := echo.New()
 
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "method=${method}, uri=${uri}, status=${status}\n",
-		Output: logFile,
-	}))
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: logFile}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 	e.Validator = &CustomValidator{validator: validator.New()}
