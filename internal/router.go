@@ -10,6 +10,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"os"
 )
 
 type CustomValidator struct {
@@ -35,7 +36,15 @@ func NewRouter(db DB, postCreator PostManager) Router {
 func (r Router) Engine() *echo.Echo {
 	e := echo.New()
 
-	e.Use(middleware.Logger())
+	f, err := os.OpenFile("log/postpigeon.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(fmt.Sprintf("error opening file: %v", err))
+	}
+	defer f.Close()
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}\n",
+		Output: f,
+	}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 	e.Validator = &CustomValidator{validator: validator.New()}
