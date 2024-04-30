@@ -33,17 +33,12 @@ func NewRouter(db DB, postCreator PostManager) Router {
 	return Router{db, postCreator}
 }
 
-func (r Router) Engine() *echo.Echo {
+func (r Router) Engine(logFile *os.File) *echo.Echo {
 	e := echo.New()
 
-	f, err := os.OpenFile("log/postpigeon.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		panic(fmt.Sprintf("error opening file: %v", err))
-	}
-	defer f.Close()
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "method=${method}, uri=${uri}, status=${status}\n",
-		Output: f,
+		Output: logFile,
 	}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 

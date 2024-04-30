@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/bluele/gcache"
 	"github.com/jtanza/post-pigeon/internal"
 	"github.com/labstack/gommon/log"
@@ -14,8 +15,13 @@ func main() {
 	db := internal.NewDB()
 	go postReaper(db)
 
-	cache := gcache.New(cacheSize).LRU().Build()
-	r := internal.NewRouter(db, internal.NewPostManager(db, cache)).Engine()
+	logFile, err := os.OpenFile("log/postpigeon.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(fmt.Sprintf("error opening file: %v", err))
+	}
+	defer logFile.Close()
+
+	r := internal.NewRouter(db, internal.NewPostManager(db, gcache.New(cacheSize).LRU().Build())).Engine(logFile)
 	r.Logger.Fatal(r.Start(os.Getenv("POSTPIGEON_WEB_PORT")))
 }
 
