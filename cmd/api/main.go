@@ -4,6 +4,7 @@ import (
 	"github.com/bluele/gcache"
 	"github.com/jtanza/post-pigeon/internal"
 	"github.com/labstack/gommon/log"
+	"os"
 	"time"
 )
 
@@ -15,7 +16,7 @@ func main() {
 
 	cache := gcache.New(cacheSize).LRU().Build()
 	r := internal.NewRouter(db, internal.NewPostManager(db, cache)).Engine()
-	r.Logger.Fatal(r.Start(":8080"))
+	r.Logger.Fatal(r.Start(os.Getenv("POSTPIGEON_WEB_PORT")))
 }
 
 func postReaper(db internal.DB) {

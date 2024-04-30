@@ -109,8 +109,5 @@ func (d DB) DeleteExpiredPosts() (int64, error) {
 }
 
 func createDSN() string {
-	// https://github.com/mattn/go-sqlite3?tab=readme-ov-file#dsn-examples
-	// file:test.db?cache=shared&mode=memory
-	// build user os.Getenv("DBUSER"), auth os.Getenv("DBPASS") etc
 	return "file:postpigeon.db"
 }
