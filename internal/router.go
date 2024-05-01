@@ -47,12 +47,14 @@ func (r Router) Engine(logFile *os.File) *echo.Echo {
 	e.File("/", "public/index.html")
 	e.File("/new", "public/new.html")
 	e.File("/delete", "public/delete.html")
+	e.File("/users/find", "public/user.html")
 
 	e.GET("/posts/:uuid", r.getPost)
 	e.POST("/posts", r.createPost)
 	e.DELETE("/posts", r.deletePost)
 
 	e.GET("/users/:fingerprint", r.getUserPosts)
+	e.POST("/users/find", r.getUserFingerprint)
 
 	return e
 }
@@ -135,13 +137,47 @@ func (r Router) getUserPosts(c echo.Context) error {
 	return c.HTML(http.StatusOK, posts)
 }
 
+func (r Router) getUserFingerprint(c echo.Context) error {
+	var request model.GetUserRequest
+	if err := c.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := c.Validate(request); err != nil {
+		return err
+	}
+
+	fingerprint, err := Fingerprint(request.PublicKey)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+
+	if exists, err := r.postManager.HasPosts(fingerprint); err != nil {
+		return err
+	} else if !exists {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+
+	t, err := template.New("user").ParseFiles("templates/user")
+	if err != nil {
+		return err
+	}
+
+	var buf bytes.Buffer
+	if err = t.Execute(&buf, map[string]interface{}{"Fingerprint": fingerprint}); err != nil {
+		return err
+	}
+
+	return c.HTML(200, buf.String())
+}
+
 func customHTTPErrorHandler(e error, c echo.Context) {
 	errorMessage := e.Error()
 	code := http.StatusInternalServerError
 	if he, ok := e.(*echo.HTTPError); ok {
 		// TODO case for others
 		if he.Code == http.StatusNotFound {
-			errorMessage = "The page you are looking for does not exist"
+			errorMessage = "What you are looking for does not exist"
 		} else {
 			errorMessage = fmt.Sprintf("%s", he.Message)
 		}

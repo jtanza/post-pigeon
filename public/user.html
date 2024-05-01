@@ -4,11 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
 </head>
 <body>
 
-<form id="foo" onsubmit="return sendDeletePost()">
+<!-- form -->
+<form id="foo" action="/users/find" method="POST" enctype="multipart/form-data">
     <section class="section">
         <div class="columns">
             <div class="column is-half is-offset-one-quarter">
@@ -18,29 +20,20 @@
                     <a href="/delete" class="mr-3">Delete</a>
                     <a href="/users/find" class="mr-3">Find User</a>
                 </div>
-
+                <p>Instructions for use</p>
+                <br>
+                <!-- Public Key -->
                 <div class="field">
-                    <label class="label">Post UUID</label>
+                    <label class="label">Public Key</label>
                     <div class="control">
                         <label>
-                            <input name="uuid" class="input" type="text" placeholder="1b2b62db-5ea4-512d-a1a3-ff3e620a2f46">
+                            <textarea name="publickey" class="textarea" placeholder="-----BEGIN PUBLIC KEY-----MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAdI8T8Vfccs6rWACR3b5o3MuVkYjfgN2nnYAXYNC4fIVWgyfEeTYIGIjLxEB9BLquMld4Je+1vITaNQWfuRTD2HcBax6NRwxwcNGqwoJNWpCry9AXxRiDACkks9I2f08BIIHlOCLnPUfIWrASmuNGhyWtSUtAJrEKBzI+y/fyWp7z09U=&#10;-----END PUBLIC KEY-----" rows="6"></textarea>
                         </label>
                     </div>
                 </div>
-
-                <!-- Signature -->
-                <div class="field">
-                    <label class="label">Base64 Encoded Signature of Post</label>
-                    <div class="control">
-                        <label>
-                            <textarea name="signature" class="textarea" placeholder="MIGIAkIA1kTl7BljHlrQ6uL04hGavPXWv+g1/NOBhPqRwldmg5pjPhC3YFxxnMtBNkfJcZJPxxNcsu9Ydr8KCej3wR+yHu4CQgH18fTvqze6qo3Z1q13m1Cjwz2BnFf9ZY6cPRLuIP6NIXsi0nbqeAHzcZqaayGa5Rm1ouzBCnCkAoxLn6hN0nT9vQ==" rows="4"></textarea>
-                        </label>
-                    </div>
-                </div>
-
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" id="deletepostbtn" class="button is-link">Delete</button>
+                        <button type="submit" class="button is-link">Publish</button>
                     </div>
                     <div class="control">
                         <button class="button is-link is-light">Cancel</button>
@@ -50,6 +43,5 @@
         </div>
     </section>
 </form>
-<script src="./public/script.js" type="text/javascript"></script>
 </body>
 </html>

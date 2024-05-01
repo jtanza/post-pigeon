@@ -23,7 +23,7 @@
               <i class="fas fa-fingerprint"></i>
               </span>
               {{if not (eq (len .) 0) }}
-                <span><p class="subtitle is-6">{{ (index . 0).Fingerprint }}</p></span>
+                <span><p class="subtitle is-6 has-text-weight-semibold">{{ (index . 0).Fingerprint }}</p></span>
               {{end}}
             </span>
             <div class="mt-6">

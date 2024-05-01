@@ -15,6 +15,7 @@
             <p style="display:inline" class="has-text-weight-bold mr-3 "><a style="color:black;" href="/">Post Pigeon 🐦</a></p>
             <a href="/new" class="mr-3">New</a>
             <a href="/delete" class="mr-3">Delete</a>
+            <a href="/users/find" class="mr-3">Find User</a>
         </div>
       <h1 class="title is-2 is-spaced has-text-weight-bold">{{ .Title}}</h1>
       <div class="mb-2">
