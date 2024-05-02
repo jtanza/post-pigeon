@@ -47,7 +47,7 @@ func (pm PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Body)
+	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Title)
 	if err != nil {
 		return "", err
 	}
@@ -60,7 +60,7 @@ func (pm PostManager) CreatePost(request model.PostRequest) (string, error) {
 }
 
 func (pm PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
-	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Body)
+	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Title)
 	if err != nil {
 		return false, err
 	}
@@ -149,14 +149,18 @@ func (pm PostManager) GetAllUserPosts(fingerprint string) (string, error) {
 }
 
 // we use the base64 encoded signature to produce the deterministic (version 5) uuid
-func GenerateDeterministicUUID(key string, content string) (string, error) {
+func GenerateDeterministicUUID(key string, title string) (string, error) {
+	if len(key) == 0 || len(title) == 0 {
+		return "", errors.New("invalid title or key")
+	}
+
 	id, err := uuid.FromBytes([]byte(namespace)[:16])
 	if err != nil {
 		return "", err
 	}
 
 	buf := &bytes.Buffer{}
-	if err := gob.NewEncoder(buf).Encode([]string{key, content}); err != nil {
+	if err := gob.NewEncoder(buf).Encode([]string{key, title}); err != nil {
 		return "", err
 	}
 
