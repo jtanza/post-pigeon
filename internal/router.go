@@ -43,18 +43,18 @@ func (r Router) Engine(logFile *os.File) *echo.Echo {
 
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
-	e.Static("public", "./public")
+	e.Static("/public", "./public")
 	e.File("/", "public/index.html")
 	e.File("/new", "public/new.html")
 	e.File("/delete", "public/delete.html")
-	e.File("/users/find", "public/user.html")
+	e.File("/search/users", "public/user.html")
 
 	e.GET("/posts/:uuid", r.getPost)
 	e.POST("/posts", r.createPost)
 	e.DELETE("/posts", r.deletePost)
 
+	e.POST("/users", r.getUserFingerprint)
 	e.GET("/users/:fingerprint", r.getUserPosts)
-	e.POST("/users/find", r.getUserFingerprint)
 
 	return e
 }
@@ -138,7 +138,7 @@ func (r Router) getUserPosts(c echo.Context) error {
 }
 
 func (r Router) getUserFingerprint(c echo.Context) error {
-	var request model.GetUserRequest
+	var request model.UserRequest
 	if err := c.Bind(&request); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}

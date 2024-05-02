@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PostPigeon</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="/public/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
@@ -17,10 +17,13 @@
       <p style="display:inline" class="has-text-weight-bold mr-3 "><a style="color:black;" href="/">Post Pigeon 🐦</a></p>
       <a href="/new" class="mr-3">New</a>
       <a href="/delete" class="mr-3">Delete</a>
-      <a href="/users/find" class="mr-3">Find User</a>
+      <a href="/search/users" class="mr-3">Find User</a>
+      <a style="color:black;" href="https://github.com/jtanza/post-pigeon" class="mr-3"><i class="fab fa-github"></i></a>
     </div>
     <h1 class="title">Fingerprint</h1>
-<p>This is the associated fingerprint of the provided public key. It can be used throughout Post Pigeon wherever a user UUID is expected. For example, you can use it to fetch all posts <a href="/users/{{ .Fingerprint }}">a user has published.</a></p>
+<p>This is the associated fingerprint of the provided public key.</p>
+<br>
+<p>It can be used throughout Post Pigeon wherever a user UUID is expected. For example, you can use it to fetch all posts <a href="/users/{{ .Fingerprint }}">a user has published.</a></p>
 <br>
 <span class="icon-text">
    <span class="icon">

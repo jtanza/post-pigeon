@@ -18,7 +18,7 @@ type PostDeleteRequest struct {
 	Signature string `form:"signature" validate:"required"`
 }
 
-type GetUserRequest struct {
+type UserRequest struct {
 	PublicKey string `form:"publickey" validate:"required"`
 }
 

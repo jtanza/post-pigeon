@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hello Bulma!</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <link rel="stylesheet" href="/public/css/bulma.min.css">
 </head>
 <body>
 
 <!-- form -->
-<form id="foo" action="/users/find" method="POST" enctype="multipart/form-data">
+<form id="foo" action="/users" method="POST" enctype="multipart/form-data">
     <section class="section">
         <div class="columns">
             <div class="column is-half is-offset-one-quarter">
@@ -18,7 +18,8 @@
                     <p style="display:inline" class="has-text-weight-bold mr-3 "><a style="color:black;" href="/">Post Pigeon 🐦</a></p>
                     <a href="/new" class="mr-3">New</a>
                     <a href="/delete" class="mr-3">Delete</a>
-                    <a href="/users/find" class="mr-3">Find User</a>
+                    <a href="/search/users" class="mr-3">Find User</a>
+                    <a style="color:black;" href="https://github.com/jtanza/post-pigeon" class="mr-3"><i class="fab fa-github"></i></a>
                 </div>
                 <p>Instructions for use</p>
                 <br>
@@ -33,7 +34,7 @@
                 </div>
                 <div class="field is-grouped">
                     <div class="control">
-                        <button type="submit" class="button is-link">Publish</button>
+                        <button type="submit" class="button is-link">Search</button>
                     </div>
                     <div class="control">
                         <button class="button is-link is-light">Cancel</button>
