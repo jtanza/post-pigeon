@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PostPigeon 🐦</title>
+    <title>PostPigeon</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/public/css/bulma.min.css">
 </head>
@@ -22,7 +22,7 @@
             <h1 class="title is-2 is-spaced has-text-weight-bold">Author Archive</h1>
             <span class="icon-text">
               <span class="icon">
-              <i class="fas fa-fingerprint"></i>
+              <i class="fas fa-user"></i>
               </span>
               {{if not (eq (len .) 0) }}
                 <span><p class="subtitle is-6 has-text-weight-semibold">{{ (index . 0).Fingerprint }}</p></span>

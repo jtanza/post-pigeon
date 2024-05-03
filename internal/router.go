@@ -80,7 +80,7 @@ func (r Router) createPost(c echo.Context) error {
 	}
 
 	if err := c.Validate(request); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, "One or more fields missing or incorrect")
 	}
 
 	body, err := readFile(c)
@@ -110,7 +110,7 @@ func (r Router) deletePost(c echo.Context) error {
 	}
 
 	if err := c.Validate(request); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, "One or more fields missing or incorrect")
 	}
 
 	if err := r.postManager.RemovePost(request); err != nil {
@@ -144,7 +144,7 @@ func (r Router) getUserFingerprint(c echo.Context) error {
 	}
 
 	if err := c.Validate(request); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, "One or more fields missing or incorrect")
 	}
 
 	fingerprint, err := Fingerprint(request.PublicKey)
@@ -175,7 +175,6 @@ func customHTTPErrorHandler(e error, c echo.Context) {
 	errorMessage := e.Error()
 	code := http.StatusInternalServerError
 	if he, ok := e.(*echo.HTTPError); ok {
-		// TODO case for others
 		if he.Code == http.StatusNotFound {
 			errorMessage = "What you are looking for does not exist"
 		} else {
