@@ -58,11 +58,11 @@ func (d DB) PersistPost(postUUID string, request model.PostRequest, html string,
 
 func (d DB) DeletePost(postDeleteRequest model.PostDeleteRequest) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		if postDelete := d.db.Where("uuid = ?", postDeleteRequest.UUID).Delete(&model.Post{}); postDelete.Error != nil {
+		if postDelete := d.db.Unscoped().Where("uuid = ?", postDeleteRequest.UUID).Delete(&model.Post{}); postDelete.Error != nil {
 			return postDelete.Error
 		}
 
-		if postContentDelete := d.db.Where("post_uuid = ?", postDeleteRequest.UUID).Delete(&model.PostContent{}); postContentDelete.Error != nil {
+		if postContentDelete := d.db.Unscoped().Where("post_uuid = ?", postDeleteRequest.UUID).Delete(&model.PostContent{}); postContentDelete.Error != nil {
 			return postContentDelete.Error
 		}
 
