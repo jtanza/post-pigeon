@@ -16,7 +16,7 @@
                 <p style="display:inline" class="has-text-weight-bold mr-3 "><a style="color:black;" href="/">Post Pigeon 🐦</a></p>
                 <a href="/new" class="mr-3">New</a>
                 <a href="/delete" class="mr-3">Delete</a>
-                <a href="/search/users" class="mr-3">Find User</a>
+                <a href="/search/users" class="mr-3">Search</a>
                 <a style="color:black;" href="https://github.com/jtanza/post-pigeon" class="mr-3"><i class="fab fa-github"></i></a>
             </div>
             <div class="content">
@@ -24,17 +24,18 @@
                 <p>Post Pigeon is a site that allows you to create and share posts with other people.</p>
                 <p>You could use it to write a <a>blog post</a>, share a <a>recipe</a>, publish a <a>poem</a> or whatever else you care to.</p>
                 <p>Neither you or anyone you share your post with needs an account to publish or view content. In fact, there are no accounts on Post Pigeon.</p>
-                <p>We dont track you (there's no javascript in use), and there's no way to promote any content. With Post Pigeon you can write a post, share it with others, and delete it. That's it. </p>
+                <p>We dont track you, and there's no way to promote any content. With Post Pigeon you can write a post, share it with others, and delete it. That's it. </p>
                 <p>The code is open source and you can find it <a href="https://github.com/jtanza/post-pigeon">here</a></p>
 
                 <br>
                 <h2>How it Works</h2>
                 <p>Post Pigeon is composed of two features: creating posts and deleting them.</p>
-                <p>Both these actions are done without a user account. All "authentication" is achieved through delegation to digital signatures. Whoever holds the keys used to generate the signature of a post is the owner of it. That is, even without a user login mechanism <strong>only the author of a post will be able to delete it or claim authorship of it.</strong><sup><a href="#content_keys">[1]</a></sup></p>
+                <p>Both these actions are done without a user account.</p>
+                <p>All "authentication" is achieved through delegation to digital signatures; all posts uploaded are cryptographically signed and only the holder of the keys used to sign the message is able to subsequently delete it.</p>
 
                 <h5>Creating a Post</h5>
                 <p>To publish a post users will need to either <a href="#command_new_keys">generate new keys</a>, or use an existing pair to <a href="#command_prepare_post">sign their post content</a>.</p>
-                <p>Once the signature has been created, the key, along with the signed content and the plaintext post (markdown supported) can be <a href="/new">published</a>.</p>
+                <p>Once the signature has been created, the key, along with the signed content and the plaintext post file can be <a href="/new">published</a>.</p>
 
                 <p>Behind the scenes, we ensure the signature is valid, generate and store some HTML and publish your post to Post Pigeon for you to share.</p>
 
@@ -57,7 +58,7 @@
                 <div id="command_prepare_post">
                     <h5>Preparing a post</h5>
                     <p>In order to submit a post on Post Pigeon we need the Base64 encoded digital signature</p>
-                    <pre>$ # write your post&#13;&#10;$ echo -n "This is my first post" > data.txt&#13;&#10;$ # create your signature&#13;&#10;$ openssl dgst -sha1 -sign postpigeon-priv-key.pem < data.txt > data.sig&#13;&#10;$ # base64 encode the signature&#13;&#10;$ cat data.sig | base64</pre>
+                    <pre>$ # write your post into a file called data.txt&#13;&#10;$ echo -n "This is my first post" > data.txt&#13;&#10;$ # create your signature&#13;&#10;$ openssl dgst -sha1 -sign postpigeon-priv-key.pem < data.txt > data.sig&#13;&#10;$ # base64 encode the signature&#13;&#10;$ cat data.sig | base64</pre>
                 </div>
                 <br>
                 <div>
@@ -70,6 +71,7 @@
                     <h5>Generate the Fingerprint of your Public Key</h5>
                     <p>Post Pigeon relies on the fingerprint of your key for lots of things. It's best to think of it as your username</p>
                     <p>The command below simply parses your key from your .pem, calculates the sha256 and Base64 encodes in a URL safe way</p>
+                    <p>For convenience, you can also get your fingerprint from your public key through our <a href="/search/users">search page.</a></p>
                     <pre>$ cat postpigeon-pub-key.pem | sed '1,1d' | sed '$ d' | tr -d '\n' | base64 --decode | sha256sum | xxd -r -p | basenc --base64url&#13;&#10;FInWS6T-2_tTfzCteUyK0rQJelfKw7b9vhD6QlFiaoM=</pre>
                 </div>
 
@@ -95,6 +97,7 @@
                 <br>
                 <h5>The actual content</h5>
                 <p>All posts are plain old HTML. No javascript of any sort is called when you make a requests to <code>/posts/{uuid}</code></p>
+                <p>Posts can be written with markdown and will be properly formatted on publication.</p>
 
                 <h5>Source</h5>
                 <p>The code is hosted on <a href="https://github.com/jtanza/post-pigeon">github.</a></p>
