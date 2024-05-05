@@ -77,6 +77,11 @@
 
                 <br>
                 <h2>Some Technical Considerations</h2>
+                <h5>Design</h5>
+                <p>Nothing too special here - Post Pigeon is a Go app with some <a href="https://github.com/jtanza/post-pigeon/blob/main/go.mod">minimal dependencies</a>, and a frontend powered by <a href="https://bulma.io/">Bulma.</a></p>
+                <p>We parse all markdown content on upload into HTML and use SQLite as a db/document store for our posts. On fetch requests, we return the pre-parsed posts directly from SQLite. A small, in memory cache is used for our top content to avoid a trip to disk.</p>
+                <p>As previously mentioned, most all endpoints return HTML directly from the server. The totality of our Javascript usage is contained <a href="https://github.com/jtanza/post-pigeon/blob/main/public/script.js">here.</a></p>
+
                 <div id="content_uuids">
                     <h5>UUIDS</h5>
                     <p>UUIDs of posts are deterministically generated from the post title and the authors public key. This means if you delete a post and re-create it with the same key and title, you get the same UUID.</p>
@@ -95,10 +100,6 @@
                     <p>Post Pigeon of course has no way of verifying that the current holder of the private key is the same individual who initially signed the post. In practice this means that whoever holds the keys used to sign a post is the de-facto owner of that post on Post Pigeon</p>
                 </div>
                 <br>
-                <h5>The actual content</h5>
-                <p>All posts are plain old HTML. No javascript of any sort is called when you make a requests to <code>/posts/{uuid}</code></p>
-                <p>Posts can be written with markdown and will be properly formatted on publication.</p>
-
                 <h5>Source</h5>
                 <p>The code is hosted on <a href="https://github.com/jtanza/post-pigeon">github.</a></p>
             </div>
