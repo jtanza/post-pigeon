@@ -1,6 +1,10 @@
 package internal
 
 import (
+	"github.com/bluele/gcache"
+	"github.com/jtanza/post-pigeon/internal/model"
+	"html/template"
+	"strings"
 	"testing"
 )
 
@@ -44,5 +48,64 @@ func TestGenerateDeterministicUUIDUnique(t *testing.T) {
 func TestParseExpiration(t *testing.T) {
 	if expiration := ParseExpiration("junk"); expiration != nil {
 		t.Error("non standard expirations should return nil")
+	}
+}
+
+func TestMarkdownParses(t *testing.T) {
+	pm := NewPostManager(DB{nil}, gcache.New(1).LRU().Build())
+
+	data, err := pm.formatRequestData(model.PostRequest{
+		Title:      "Foo",
+		Body:       "# This is a title",
+		PublicKey:  pubKey,
+		Signature:  "",
+		Expiration: "",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	actual := strings.TrimRight(string(data["Body"].(template.HTML)), "\n")
+	expected := "<h1 id=\"this-is-a-title\">This is a title</h1>"
+	if actual != expected {
+		t.Errorf("markdown does not match expected\n got: %s wanted: %s", actual, expected)
+	}
+}
+
+func TestMarkdownClearsBuffer(t *testing.T) {
+	pm := NewPostManager(DB{nil}, gcache.New(1).LRU().Build())
+
+	data, err := pm.formatRequestData(model.PostRequest{
+		Title:      "Foo",
+		Body:       "a",
+		PublicKey:  pubKey,
+		Signature:  "",
+		Expiration: "",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	actual := strings.TrimRight(string(data["Body"].(template.HTML)), "\n")
+	expected := "<p>a</p>"
+	if actual != expected {
+		t.Errorf("markdown does not match expected\n got: %s wanted: %s", actual, expected)
+	}
+
+	data2, err := pm.formatRequestData(model.PostRequest{
+		Title:      "Foo",
+		Body:       "b",
+		PublicKey:  pubKey,
+		Signature:  "",
+		Expiration: "",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	actual2 := strings.TrimRight(string(data2["Body"].(template.HTML)), "\n")
+	expected2 := "<p>b</p>"
+	if actual2 != expected2 {
+		t.Errorf("markdown does not match expected\n got: %s wanted: %s", actual2, expected2)
 	}
 }

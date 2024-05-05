@@ -87,12 +87,15 @@ func (r Router) createPost(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	if len(body) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Empty body on request")
+	}
 	request.Body = body
 
 	if dupe, err := r.postManager.IsDuplicate(request); err != nil {
 		return err
 	} else if dupe {
-		return echo.NewHTTPError(http.StatusBadRequest, "Duplicate posts (same author, same content) are not allowed.")
+		return echo.NewHTTPError(http.StatusBadRequest, "Duplicate posts (same author, same title) are not allowed.")
 	}
 
 	uuid, err := r.postManager.CreatePost(request)
@@ -228,6 +231,5 @@ func readFile(c echo.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return string(b), nil
 }

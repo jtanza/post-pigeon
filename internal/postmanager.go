@@ -22,14 +22,14 @@ import (
 const namespace = "post-pigeon-namespace"
 
 type PostManager struct {
-	db             DB
-	cache          gcache.Cache
-	markdownParser *parser.Parser
+	db                 DB
+	cache              gcache.Cache
+	markdownExtensions parser.Extensions
 }
 
 func NewPostManager(db DB, cache gcache.Cache) PostManager {
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
-	return PostManager{db, cache, parser.NewWithExtensions(extensions)}
+	return PostManager{db, cache, extensions}
 }
 
 func (pm PostManager) CreatePost(request model.PostRequest) (string, error) {
@@ -189,6 +189,26 @@ func ParseExpiration(expirationRequest string) *time.Time {
 	return &expiration
 }
 
+func (pm PostManager) formatRequestData(request model.PostRequest) (map[string]any, error) {
+	fingerprint, err := Fingerprint(request.PublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	md := parser.NewWithExtensions(pm.markdownExtensions).Parse([]byte(request.Body))
+	renderer := html.NewRenderer(html.RendererOptions{Flags: html.CommonFlags | html.HrefTargetBlank})
+	sanitizedBody := bluemonday.UGCPolicy().SanitizeBytes(markdown.Render(md, renderer))
+
+	m := map[string]interface{}{
+		"Title":        request.Title,
+		"Body":         template.HTML(sanitizedBody),
+		"Fingerprint":  fingerprint,
+		"CreationDate": time.Now().Format(time.DateOnly),
+	}
+
+	return m, nil
+}
+
 func toHTML(templateName string, data any) (string, error) {
 	t, err := template.New(templateName).ParseFiles(fmt.Sprintf("templates/%s", templateName))
 	if err != nil {
@@ -201,24 +221,4 @@ func toHTML(templateName string, data any) (string, error) {
 	}
 
 	return buf.String(), nil
-}
-
-func (pm PostManager) formatRequestData(request model.PostRequest) (map[string]any, error) {
-	fingerprint, err := Fingerprint(request.PublicKey)
-	if err != nil {
-		return nil, err
-	}
-
-	md := pm.markdownParser.Parse([]byte(request.Body))
-	renderer := html.NewRenderer(html.RendererOptions{Flags: html.CommonFlags | html.HrefTargetBlank})
-	sanitizedBody := bluemonday.UGCPolicy().SanitizeBytes(markdown.Render(md, renderer))
-
-	m := map[string]interface{}{
-		"Title":        request.Title,
-		"Body":         template.HTML(sanitizedBody),
-		"Fingerprint":  fingerprint,
-		"CreationDate": time.Now().Format(time.DateOnly),
-	}
-
-	return m, nil
 }
