@@ -22,7 +22,7 @@
             <div class="content">
                 <h1>Post Pigeon</h1>
                 <p>Post Pigeon is a site that allows you to create and share posts with other people.</p>
-                <p>You could use it to write a <a>blog post</a>, share a <a>recipe</a>, publish a <a>poem</a> or whatever else you care to.</p>
+                <p>You could use it to write a <a>blog post</a>, share a <a href="https://post-pigeon.com/posts/db289811-2548-57f8-ba90-dfd488955a96">recipe</a>, publish a <a href="https://post-pigeon.com/posts/d31c7ebf-716f-56bb-8761-72bcd2fd5764">poem</a> or whatever else you care to.</p>
                 <p>Neither you or anyone you share your post with needs an account to publish or view content. In fact, there are no accounts on Post Pigeon.</p>
                 <p>We dont track you, and there's no way to promote any content. With Post Pigeon you can write a post, share it with others, and delete it. That's it. </p>
                 <p>The code is open source and you can find it <a href="https://github.com/jtanza/post-pigeon">here</a></p>
@@ -58,7 +58,7 @@
                 <div id="command_prepare_post">
                     <h5>Preparing a post</h5>
                     <p>In order to submit a post on Post Pigeon we need the Base64 encoded digital signature</p>
-                    <pre>$ # write your post into a file called data.txt&#13;&#10;$ echo -n "This is my first post" > data.txt&#13;&#10;$ # create your signature&#13;&#10;$ openssl dgst -sha1 -sign postpigeon-priv-key.pem < data.txt > data.sig&#13;&#10;$ # base64 encode the signature&#13;&#10;$ cat data.sig | base64</pre>
+                    <pre>$ # write your post into a file called data.txt&#13;&#10;$ echo -n "This is my first post" > data.txt&#13;&#10;$ # create your signature&#13;&#10;$ openssl dgst -sha1 -sign postpigeon-priv-key.pem < data.txt > data.sig&#13;&#10;$ # base64 encode the signature (this is the bit we upload)&#13;&#10;$ cat data.sig | base64&#13;&#10;MIGGAkEJadmMV73C4pQVGUtmaTuzO/GjoAi1TWlqSNn6jaPKaCDiFANgfETf1TmgJAXDNhaWk00bgJBJqQji4QiyWo2ij9/P+Fc0PIXy1ymYScN0ZbX1YyMMQv+63C8UZIAnNZ6ZKgskOQD7JgImp4R3OPI6wGBt83DmtQ=</pre>
                 </div>
                 <br>
                 <div>

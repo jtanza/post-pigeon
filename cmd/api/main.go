@@ -6,6 +6,7 @@ import (
 	"github.com/jtanza/post-pigeon/internal"
 	"github.com/labstack/gommon/log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -23,8 +24,11 @@ func main() {
 
 	cache := gcache.New(cacheSize).LRU().Build()
 	r := internal.NewRouter(db, internal.NewPostManager(db, cache)).Engine(logFile)
-	r.Logger.Fatal(r.StartAutoTLS(":443"))
-	// redirects to 443
+
+	if strings.EqualFold(os.Getenv("POST_PIGEON_ENV"), "prod") {
+		r.Logger.Fatal(r.StartAutoTLS(":443"))
+	}
+	// redirects to 443 in prod
 	r.Logger.Fatal(r.Start(":80"))
 }
 
