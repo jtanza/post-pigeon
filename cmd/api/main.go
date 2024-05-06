@@ -14,7 +14,7 @@ const cacheSize = 50
 
 func main() {
 	db := internal.NewDB()
-	go postReaper(db)
+	go reapPosts(db)
 
 	logFile, err := os.OpenFile("log/postpigeon.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -33,7 +33,7 @@ func main() {
 	}
 }
 
-func postReaper(db internal.DB) {
+func reapPosts(db internal.DB) {
 	for range time.Tick(time.Minute * 5) {
 		deleted, err := db.DeleteExpiredPosts()
 		if err != nil {

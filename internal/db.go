@@ -18,7 +18,7 @@ type DB struct {
 
 func NewDB() DB {
 	db, err := gorm.Open(sqlite.Open(createDSN()), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(logger.Warn),
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
