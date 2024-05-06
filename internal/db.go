@@ -30,6 +30,7 @@ func NewDB() DB {
 	return DB{db}
 }
 
+// PersistPost derives a model.Post and model.PostContent from the provided request and persists them to the db
 func (d DB) PersistPost(postUUID string, request model.PostRequest, html string, expiration *time.Time) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		fingerprint, err := Fingerprint(request.PublicKey)
@@ -56,6 +57,7 @@ func (d DB) PersistPost(postUUID string, request model.PostRequest, html string,
 	})
 }
 
+// DeletePost drops from the db the model.Post and model.PostContent associated with the postDeleteRequest
 func (d DB) DeletePost(postDeleteRequest model.PostDeleteRequest) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if postDelete := d.db.Unscoped().Where("uuid = ?", postDeleteRequest.UUID).Delete(&model.Post{}); postDelete.Error != nil {
@@ -92,6 +94,7 @@ func (d DB) GetPost(postUUID string) (*model.Post, error) {
 	return &post, nil
 }
 
+// GetUserPosts returns all known posts published by the provided fingerprint
 func (d DB) GetUserPosts(fingerprint string) ([]model.FullPost, error) {
 	var posts []model.FullPost
 	if postQuery := d.db.Model(&model.Post{}).Select("post.UUID, post.Key, post.Fingerprint, post.created_at, post_content.Title, post_content.HTML, post_content.Message").Joins("left join post_content on post.uuid = post_content.post_uuid").Where("post.fingerprint = ?", fingerprint).Scan(&posts); postQuery.Error != nil {

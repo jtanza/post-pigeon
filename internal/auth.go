@@ -10,6 +10,8 @@ import (
 	"errors"
 )
 
+// ValidateSignature ensures that the signature provided in base64EncodedSignature is valid, i.e.
+// it was signed by the provided rawPubKey and contains the provided message
 func ValidateSignature(rawPubKey string, base64EncodedSignature string, message string) error {
 	block, _ := pem.Decode([]byte(rawPubKey))
 	if block == nil {
@@ -35,6 +37,8 @@ func ValidateSignature(rawPubKey string, base64EncodedSignature string, message 
 	return nil
 }
 
+// Fingerprint will attempt to generate a fingerprint from the provided rawPubKey
+// The fingerprint is simply the URL safe, Base64 encoded sha256 hash of the public key
 func Fingerprint(rawPubKey string) (string, error) {
 	block, _ := pem.Decode([]byte(rawPubKey))
 	if block == nil {

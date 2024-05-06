@@ -9,9 +9,10 @@ import (
 )
 
 const pubKey = "-----BEGIN PUBLIC KEY-----\nMIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAdI8T8Vfccs6rWACR3b5o3MuVkYjf\ngN2nnYAXYNC4fIVWgyfEeTYIGIjLxEB9BLquMld4Je+1vITaNQWfuRTD2HcBax6N\nRwxwcNGqwoJNWpCry9AXxRiDACkks9I2f08BIIHlOCLnPUfIWrASmuNGhyWtSUtA\nJrEKBzI+y/fyWp7z09U=\n-----END PUBLIC KEY-----"
+const namespace = "post-pigeon-namespace"
 
 func TestGenerateDeterministicUUID(t *testing.T) {
-	uuid, err := GenerateDeterministicUUID(pubKey, "hello world")
+	uuid, err := GenerateDeterministicUUID(pubKey, "hello world", namespace)
 	if err != nil {
 		t.Error(err)
 	}
@@ -20,7 +21,7 @@ func TestGenerateDeterministicUUID(t *testing.T) {
 		t.Error("non matching uuid")
 	}
 
-	uuid, err = GenerateDeterministicUUID(pubKey, "hello world")
+	uuid, err = GenerateDeterministicUUID(pubKey, "hello world", namespace)
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,12 +31,12 @@ func TestGenerateDeterministicUUID(t *testing.T) {
 }
 
 func TestGenerateDeterministicUUIDUnique(t *testing.T) {
-	uuid, err := GenerateDeterministicUUID(pubKey, "hello world")
+	uuid, err := GenerateDeterministicUUID(pubKey, "hello world", namespace)
 	if err != nil {
 		t.Error(err)
 	}
 
-	uuid2, err := GenerateDeterministicUUID(pubKey, "not hello world")
+	uuid2, err := GenerateDeterministicUUID(pubKey, "not hello world", namespace)
 	if err != nil {
 		t.Error(err)
 	}

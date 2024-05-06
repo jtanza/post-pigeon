@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bluele/gcache"
 	"github.com/jtanza/post-pigeon/internal"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"os"
 	"time"
@@ -21,8 +22,15 @@ func main() {
 	}
 	defer logFile.Close()
 
-	r := internal.NewRouter(db, internal.NewPostManager(db, gcache.New(cacheSize).LRU().Build())).Engine(logFile)
+	cache := gcache.New(cacheSize).LRU().Build()
+	r := internal.NewRouter(db, internal.NewPostManager(db, cache)).Engine(logFile)
+
 	r.Logger.Fatal(r.StartAutoTLS(":443"))
+
+	// redirects to 443
+	if err = echo.New().Start(":80"); err != nil {
+		log.Print(fmt.Errorf("error when starting HTTP server: %w", err))
+	}
 }
 
 func postReaper(db internal.DB) {

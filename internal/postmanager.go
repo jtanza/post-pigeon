@@ -13,23 +13,28 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"hash/fnv"
 	"html/template"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jtanza/post-pigeon/internal/model"
 )
 
-const namespace = "post-pigeon-namespace"
-
 type PostManager struct {
 	db                 DB
 	cache              gcache.Cache
+	namespace          string
 	markdownExtensions parser.Extensions
 }
 
 func NewPostManager(db DB, cache gcache.Cache) PostManager {
+	namespace := os.Getenv("POST_PIGEON_NS")
+	if len(namespace) == 0 {
+		log.Fatal("unset namespace for app")
+	}
+
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
-	return PostManager{db, cache, extensions}
+	return PostManager{db, cache, namespace, extensions}
 }
 
 func (pm PostManager) CreatePost(request model.PostRequest) (string, error) {
@@ -47,7 +52,7 @@ func (pm PostManager) CreatePost(request model.PostRequest) (string, error) {
 		return "", err
 	}
 
-	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Title)
+	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Title, pm.namespace)
 	if err != nil {
 		return "", err
 	}
@@ -60,7 +65,7 @@ func (pm PostManager) CreatePost(request model.PostRequest) (string, error) {
 }
 
 func (pm PostManager) IsDuplicate(request model.PostRequest) (bool, error) {
-	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Title)
+	postUUID, err := GenerateDeterministicUUID(request.PublicKey, request.Title, pm.namespace)
 	if err != nil {
 		return false, err
 	}
@@ -81,6 +86,8 @@ func (pm PostManager) HasPosts(fingerprint string) (bool, error) {
 	return len(posts) > 0, nil
 }
 
+// RemovePost will use the stored public key and post message to delete a post from the provided request
+// iff the signatures can be verified using the stored key/message.
 func (pm PostManager) RemovePost(request model.PostDeleteRequest) error {
 	post, err := pm.db.GetPost(request.UUID)
 	if err != nil {
@@ -148,15 +155,10 @@ func (pm PostManager) GetAllUserPosts(fingerprint string) (string, error) {
 	return toHTML("posts", data)
 }
 
-// we use the base64 encoded signature to produce the deterministic (version 5) uuid
-func GenerateDeterministicUUID(key string, title string) (string, error) {
+// GenerateDeterministicUUID creates a deterministic (version 5) uuid from the provided key and title
+func GenerateDeterministicUUID(key, title, namespace string) (string, error) {
 	if len(key) == 0 || len(title) == 0 {
 		return "", errors.New("invalid title or key")
-	}
-
-	id, err := uuid.FromBytes([]byte(namespace)[:16])
-	if err != nil {
-		return "", err
 	}
 
 	buf := &bytes.Buffer{}
@@ -165,13 +167,20 @@ func GenerateDeterministicUUID(key string, title string) (string, error) {
 	}
 
 	h := fnv.New64()
-	if _, err = h.Write(buf.Bytes()); err != nil {
+	if _, err := h.Write(buf.Bytes()); err != nil {
+		return "", err
+	}
+
+	id, err := uuid.FromBytes([]byte(namespace)[:16])
+	if err != nil {
 		return "", err
 	}
 
 	return uuid.NewSHA1(id, h.Sum(nil)).String(), nil
 }
 
+// ParseExpiration converts common expiration times used on our frontend into actual time periods
+// our post reaper will leverage to expire posts.
 func ParseExpiration(expirationRequest string) *time.Time {
 	expiration := time.Now().UTC()
 	switch expirationRequest {
