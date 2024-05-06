@@ -40,7 +40,7 @@ func (r Router) Engine(logFile *os.File) *echo.Echo {
 	e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("post-pigeon.com", "www.post-pigeon.com")
 	e.AutoTLSManager.Cache = autocert.DirCache("/var/www/.cache")
 
-	e.Pre(middleware.HTTPSWWWRedirect())
+	e.Pre(middleware.HTTPSRedirect())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: logFile}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
