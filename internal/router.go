@@ -2,11 +2,15 @@ package internal
 
 import (
 	"bytes"
+	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/jtanza/post-pigeon/internal/model"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/crypto/acme"
+	"golang.org/x/crypto/acme/autocert"
 	"html/template"
 	"io"
 	"net/http"
@@ -55,6 +59,23 @@ func (r Router) Engine(logFile *os.File) *echo.Echo {
 
 	e.POST("/users", r.getUserFingerprint)
 	e.GET("/users/:fingerprint", r.getUserPosts)
+
+	autoTLSManager := autocert.Manager{
+		Prompt: autocert.AcceptTOS,
+		Cache:  autocert.DirCache("/var/www/.cache"),
+	}
+	s := http.Server{
+		Addr:    ":443",
+		Handler: e,
+		TLSConfig: &tls.Config{
+			GetCertificate: autoTLSManager.GetCertificate,
+			NextProtos:     []string{acme.ALPNProto},
+		},
+	}
+
+	if err := s.ListenAndServeTLS("", ""); !errors.Is(err, http.ErrServerClosed) {
+		e.Logger.Fatal(err)
+	}
 
 	return e
 }

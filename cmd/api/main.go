@@ -22,7 +22,7 @@ func main() {
 	defer logFile.Close()
 
 	r := internal.NewRouter(db, internal.NewPostManager(db, gcache.New(cacheSize).LRU().Build())).Engine(logFile)
-	r.Logger.Fatal(r.Start(os.Getenv("POSTPIGEON_WEB_PORT")))
+	r.Logger.Fatal(r.StartAutoTLS(":443"))
 }
 
 func postReaper(db internal.DB) {
