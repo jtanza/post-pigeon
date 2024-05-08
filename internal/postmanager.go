@@ -33,7 +33,7 @@ func NewPostManager(db DB, cache gcache.Cache) PostManager {
 		log.Fatal("unset namespace for app")
 	}
 
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock | parser.Footnotes
 	return PostManager{db, cache, namespace, extensions}
 }
 
