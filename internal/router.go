@@ -169,17 +169,12 @@ func (r Router) getUserFingerprint(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
-	t, err := template.New("user").ParseFiles("templates/user")
+	posts, err := r.postManager.GetAllUserPosts(fingerprint)
 	if err != nil {
 		return err
 	}
 
-	var buf bytes.Buffer
-	if err = t.Execute(&buf, map[string]interface{}{"Fingerprint": fingerprint}); err != nil {
-		return err
-	}
-
-	return c.HTML(200, buf.String())
+	return c.HTML(http.StatusOK, posts)
 }
 
 func customHTTPErrorHandler(e error, c echo.Context) {
