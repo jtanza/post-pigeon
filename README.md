@@ -23,11 +23,11 @@ Create your db
 $ touch postpigeon.db
 $ sqlite3 postpigeon.db < migrations/1_add_init_tables.up.sql
 ```
-Set your SHA1 namespace
+Set your SHA1 [namespace](https://github.com/jtanza/post-pigeon/blob/main/internal/postmanager.go#L174-L179)
 ```shell
 $ export POST_PIGEON_NS="whatever.youd.like.uuid"
 ```
-Run the app
+Run the app and point your browser to `localhost:80` 
 ```shell
 $ go run cmd/api/main.go
 ```
