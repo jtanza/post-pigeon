@@ -7,7 +7,7 @@ Checkout the [docs](https://post-pigeon.com) for info on using the app and how i
 
 ## Example
 
-<img width="1435" alt="Screenshot 2024-05-08 at 7 23 43 PM" src="https://github.com/jtanza/post-pigeon/assets/10635096/f75e42f7-3a94-4089-b04e-44b6790468e1">
+<img width="1436" alt="Screenshot 2024-05-08 at 8 51 51 PM" src="https://github.com/jtanza/post-pigeon/assets/10635096/d7495a7e-fcc5-4a9c-b8e7-5953812f7fff">
 
 
 ## Running Locally
