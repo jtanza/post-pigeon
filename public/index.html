@@ -59,7 +59,7 @@
                     <h5>Preparing a post</h5>
                     <p>In order to submit a post on Post Pigeon we need the Base64 encoded digital signature</p>
                     <p>The example below writes our post into a file called <code>data.txt</code>. This is the file we will use on upload</p>
-                    <pre>$ # write your post into a file called data.txt&#13;&#10;$ echo -n "This is my first post" > data.txt&#13;&#10;$ # create your signature&#13;&#10;$ openssl dgst -sha1 -sign postpigeon-priv-key.pem < data.txt > data.sig&#13;&#10;$ # base64 encode the signature (this is the bit we upload)&#13;&#10;$ cat data.sig | base64&#13;&#10;MIGGAkEJadmMV73C4pQVGUtmaTuzO/GjoAi1TWlqSNn6jaPKaCDiFANgfETf1TmgJAXDNhaWk00bgJBJqQji4QiyWo2ij9/P+Fc0PIXy1ymYScN0ZbX1YyMMQv+63C8UZIAnNZ6ZKgskOQD7JgImp4R3OPI6wGBt83DmtQ=</pre>
+                    <pre>$ # write your post into a file called data.txt&#13;&#10;$ echo -n "This is my first post" > data.txt&#13;&#10;$ # create your signature&#13;&#10;$ openssl dgst -sha1 -sign postpigeon-priv-key.pem < data.txt > data.sig&#13;&#10;$ # base64 encode the signature (this is the bit we upload along with our data.txt file)&#13;&#10;$ cat data.sig | base64&#13;&#10;MIGGAkEJadmMV73C4pQVGUtmaTuzO/GjoAi1TWlqSNn6jaPKaCDiFANgfETf1TmgJAXDNhaWk00bgJBJqQji4QiyWo2ij9/P+Fc0PIXy1ymYScN0ZbX1YyMMQv+63C8UZIAnNZ6ZKgskOQD7JgImp4R3OPI6wGBt83DmtQ=</pre>
                 </div>
                 <br>
                 <div>
