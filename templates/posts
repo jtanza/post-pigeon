@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<div class="columns is-mobile">
+<div class="columns is-half is-offset-one-quarter">
     <div class="column is-8 is-offset-2">
         <section class="section">
             <div class="mb-6">
