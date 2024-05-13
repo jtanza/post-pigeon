@@ -2,7 +2,9 @@
 
 Post Pigeon is a web app that allows users to publish and share posts with others. 
 
-All "authentication" is achieved through delegation to digital signatures; all posts uploaded are cryptographically signed and only the holder of the keys used to sign the message is able to subsequently delete it. As such no user accounts are required to use Post Pigeon
+There are no user accounts required to use Post Pigeon.
+
+All "authentication" is achieved through delegation to digital signatures; all posts uploaded are cryptographically signed and only the holder of the keys used to sign the message is able to subsequently delete it.
 
 It can be self-hosted, run locally or used at [post-pigeon.com](https://post-pigeon.com)
 
