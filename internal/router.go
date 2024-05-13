@@ -15,6 +15,8 @@ import (
 	"strings"
 )
 
+const maxFileSize = 15000
+
 type CustomValidator struct {
 	validator *validator.Validate
 }
@@ -224,6 +226,11 @@ func readFile(c echo.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	if file.Size >= maxFileSize {
+		return "", fmt.Errorf("file size exceeds limit of %d bytes", maxFileSize)
+	}
+
 	src, err := file.Open()
 	if err != nil {
 		return "", err

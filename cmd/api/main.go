@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/bluele/gcache"
 	"github.com/jtanza/post-pigeon/internal"
 	"github.com/labstack/gommon/log"
+	"net/http"
 	"os"
-	"strings"
+	"os/signal"
 	"time"
 )
 
@@ -25,11 +28,25 @@ func main() {
 	cache := gcache.New(cacheSize).LRU().Build()
 	r := internal.NewRouter(db, internal.NewPostManager(db, cache)).Engine(logFile)
 
-	if strings.EqualFold(os.Getenv("POST_PIGEON_ENV"), "prod") {
-		r.Logger.Fatal(r.StartAutoTLS(":443"))
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	// Start server
+	go func() {
+		if err = r.StartAutoTLS(":443"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			r.Logger.Fatal("shutting down the server")
+		}
+		// redirects to 443 in prod
+		r.Logger.Fatal(r.Start(":80"))
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
+	<-ctx.Done()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err = r.Shutdown(ctx); err != nil {
+		r.Logger.Fatal(err)
 	}
-	// redirects to 443 in prod
-	r.Logger.Fatal(r.Start(":80"))
 }
 
 func reapPosts(db internal.DB) {
