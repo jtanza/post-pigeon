@@ -16,14 +16,16 @@ import (
 const cacheSize = 50
 
 func main() {
-	db := internal.NewDB()
-	go reapPosts(db)
-
 	logFile, err := os.OpenFile("log/postpigeon.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(fmt.Sprintf("error opening file: %v", err))
 	}
 	defer logFile.Close()
+
+	log.SetOutput(logFile)
+
+	db := internal.NewDB()
+	go reapPosts(db)
 
 	cache := gcache.New(cacheSize).LRU().Build()
 	r := internal.NewRouter(db, internal.NewPostManager(db, cache)).Engine(logFile)
@@ -34,7 +36,7 @@ func main() {
 	// Start server
 	go func() {
 		if err = r.StartAutoTLS(":443"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			r.Logger.Fatal("shutting down the server")
+			r.Logger.Fatalf("shutting down the server %s", err)
 		}
 		// redirects to 443 in prod
 		r.Logger.Fatal(r.Start(":80"))
