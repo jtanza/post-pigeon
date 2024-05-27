@@ -36,10 +36,10 @@ func main() {
 	// Start server
 	go func() {
 		if err = r.StartAutoTLS(":443"); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			r.Logger.Fatalf("shutting down the server %s", err)
+			log.Fatalf("shutting down the server %s", err)
 		}
 		// redirects to 443 in prod
-		r.Logger.Fatal(r.Start(":80"))
+		log.Fatal(r.Start(":80"))
 	}()
 
 	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
@@ -47,7 +47,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err = r.Shutdown(ctx); err != nil {
-		r.Logger.Fatal(err)
+		log.Fatal(err)
 	}
 }
 
