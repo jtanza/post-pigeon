@@ -22,7 +22,7 @@
             <div class="content">
                 <h1>Post Pigeon</h1>
                 <p>Post Pigeon is a site that allows you to create and share posts with other people.</p>
-                <p>You could use it to write a <a href="https://post-pigeon.com/posts/33d947e3-2fdb-5e96-9a87-7d09a19ac729">blog post</a>, share a <a href="https://post-pigeon.com/posts/db289811-2548-57f8-ba90-dfd488955a96">recipe</a>, publish a <a href="https://post-pigeon.com/posts/d31c7ebf-716f-56bb-8761-72bcd2fd5764">poem</a> or whatever else you care to.</p>
+                <p>You could use it to say, write a <a href="https://post-pigeon.com/posts/33d947e3-2fdb-5e96-9a87-7d09a19ac729">blog post</a>, share a <a href="https://post-pigeon.com/posts/db289811-2548-57f8-ba90-dfd488955a96">recipe</a> or whatever else you care to.</p>
                 <p>Neither you or anyone you share your post with needs an account to publish or view content. In fact, there are no accounts on Post Pigeon.</p>
                 <p>We dont track you, and there's no way to promote any content. With Post Pigeon you can write a post, share it with others, and delete it. That's it. </p>
                 <p>The code is open source and you can find it <a href="https://github.com/jtanza/post-pigeon">here</a></p>
@@ -30,8 +30,7 @@
                 <br>
                 <h2>How it Works</h2>
                 <p>Post Pigeon is composed of two features: creating posts and deleting them.</p>
-                <p>Both these actions are done without a user account.</p>
-                <p>All "authentication" is achieved through delegation to digital signatures; all posts uploaded are cryptographically signed and only the holder of the keys used to sign the message is able to subsequently delete it.</p>
+                <p>All "authorization" on these actions is achieved through delegation to digital signatures; all posts uploaded are cryptographically signed and only the holder of the keys used to sign the message is able to subsequently delete it.</p>
 
                 <h5>Creating a Post</h5>
                 <p>To publish a post users will need to either <a href="#command_new_keys">generate new keys</a>, or use an existing pair to <a href="#command_prepare_post">sign their post content</a>.</p>
@@ -108,3 +107,4 @@
     </div>
 </section>
 </body>
+
