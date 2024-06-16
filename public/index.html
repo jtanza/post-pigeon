@@ -78,8 +78,7 @@
                 <br>
                 <h2>Some Technical Considerations</h2>
                 <h5>Design</h5>
-                <p>Nothing too special here - Post Pigeon is a Go app with some <a href="https://github.com/jtanza/post-pigeon/blob/main/go.mod">minimal dependencies</a>, and a frontend powered by <a href="https://bulma.io/">Bulma.</a></p>
-                <p>We parse all markdown content on upload into HTML and use SQLite as a db/document store for our posts. On fetch requests, we return the pre-parsed posts directly from SQLite. A small, in memory cache is used for our top content to avoid a trip to disk.</p>
+                <p>We parse all markdown content on upload into HTML and use SQLite as a db/document store for our posts. On fetch requests, we return the pre-parsed posts directly from SQLite.</p>
                 <p>As previously mentioned, most all endpoints return HTML directly from the server. The totality of our Javascript usage is contained <a href="https://github.com/jtanza/post-pigeon/blob/main/public/script.js">here.</a></p>
 
                 <div id="content_uuids">
